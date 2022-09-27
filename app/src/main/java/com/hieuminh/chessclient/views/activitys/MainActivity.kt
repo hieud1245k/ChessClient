@@ -7,6 +7,7 @@ import com.hieuminh.chessclient.common.enums.ChessManType
 import com.hieuminh.chessclient.common.enums.PlayerType
 import com.hieuminh.chessclient.databinding.ActivityMainBinding
 import com.hieuminh.chessclient.models.Box
+import com.hieuminh.chessclient.models.Pawn
 import com.hieuminh.chessclient.utils.ViewUtils
 import com.hieuminh.chessclient.views.activitys.base.BaseActivity
 import com.hieuminh.chessclient.views.adapters.BoxAdapter
@@ -16,6 +17,11 @@ import kotlin.math.min
 class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventListener<Box> {
     private lateinit var boxAdapter: BoxAdapter
     private lateinit var boxList: MutableList<Box>
+    private lateinit var boxMap: Map<Pair<Int, Int>, Box>
+
+    private var currentBoxSelected: Box? = null
+    private val moveBoxList = mutableListOf<Box>()
+    private val killBoxList = mutableListOf<Box>()
 
     override fun getViewBinding() = ActivityMainBinding.inflate(layoutInflater)
 
@@ -25,7 +31,83 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
     }
 
     override fun onItemClick(item: Box, position: Int) {
-        Log.d("HIEU_MINH", item.chessMan?.playerType?.name.toString())
+        Log.d("POSITION", position.toString())
+        if (item.canKill || item.canMove) {
+            item.chessMan = currentBoxSelected?.chessMan
+            currentBoxSelected?.run {
+                chessMan = null
+                isClicked = false
+                notifyChanged(boxAdapter)
+            }
+            currentBoxSelected = null
+            killBoxList.forEach {
+                it.canKill = false
+                it.notifyChanged(boxAdapter)
+            }
+            moveBoxList.forEach {
+                it.canMove = false
+                it.notifyChanged(boxAdapter)
+            }
+            return
+        }
+        if (item.chessMan == null || currentBoxSelected == item || item.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
+            return
+        }
+        moveBoxList.forEach {
+            it.canMove = false
+            it.notifyChanged(boxAdapter)
+        }
+        killBoxList.forEach {
+            it.canKill = false
+            it.notifyChanged(boxAdapter)
+        }
+        moveBoxList.clear()
+        killBoxList.clear()
+        item.isClicked = true
+        item.notifyChanged(boxAdapter)
+        currentBoxSelected?.isClicked = false
+        currentBoxSelected?.notifyChanged(boxAdapter)
+        when (item.chessMan) {
+            is Pawn -> onPawnClicked(item)
+        }
+        moveBoxList.forEach {
+            it.canMove = true
+            it.notifyChanged(boxAdapter)
+        }
+        killBoxList.forEach {
+            it.canKill = true
+            it.notifyChanged(boxAdapter)
+        }
+        currentBoxSelected = item
+    }
+
+    private fun onPawnClicked(item: Box) {
+        boxMap[Pair(item.x, item.y + 1)]?.let {
+            if (it.chessMan == null) {
+                moveBoxList.add(it)
+            }
+        }
+        if (item.y == 1) {
+            boxMap[Pair(item.x, item.y + 2)]?.let {
+                if (it.chessMan == null) {
+                    moveBoxList.add(it)
+                }
+            }
+        }
+        boxMap[Pair(item.x + 1, item.y + 1)]?.let {
+            if (it.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
+                killBoxList.add(it)
+            }
+        }
+        boxMap[Pair(item.x - 1, item.y + 1)]?.let {
+            if (it.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
+                killBoxList.add(it)
+            }
+        }
+    }
+
+    private fun onCastleClicked(item: Box) {
+
     }
 
     override fun initListener() {
@@ -62,5 +144,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
                 boxList.add(box)
             }
         }
+        boxMap = boxList.associateBy { Pair(it.x, it.y) }
     }
 }

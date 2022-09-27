@@ -9,4 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="colorWeighGreen">#006004</color>
     <color name="colorOrange">#FF5722</color>
+    <color name="colorLightGreen">#99F6ED</color>
+    <color name="colorLightYellow">#ECF3AE</color>
+    <color name="colorLightRed">#FAB5B5</color>
 </resources>
