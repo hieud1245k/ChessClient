@@ -7,6 +7,7 @@ import com.hieuminh.chessclient.common.enums.ChessManType
 import com.hieuminh.chessclient.common.enums.PlayerType
 import com.hieuminh.chessclient.databinding.ActivityMainBinding
 import com.hieuminh.chessclient.models.Box
+import com.hieuminh.chessclient.models.Castle
 import com.hieuminh.chessclient.models.Pawn
 import com.hieuminh.chessclient.utils.ViewUtils
 import com.hieuminh.chessclient.views.activitys.base.BaseActivity
@@ -69,6 +70,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
         currentBoxSelected?.notifyChanged(boxAdapter)
         when (item.chessMan) {
             is Pawn -> onPawnClicked(item)
+            is Castle -> onCastleClicked(item)
         }
         moveBoxList.forEach {
             it.canMove = true
@@ -107,7 +109,50 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
     }
 
     private fun onCastleClicked(item: Box) {
-
+        for (i in item.x..7) {
+            val box = boxMap[Pair(i + 1, item.y)] ?: break
+            if (box.chessMan == null) {
+                moveBoxList.add(box)
+                continue
+            }
+            if (box.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
+                killBoxList.add(box)
+            }
+            break
+        }
+        for (i in item.y..7) {
+            val box = boxMap[Pair(item.x, i + 1)] ?: break
+            if (box.chessMan == null) {
+                moveBoxList.add(box)
+                continue
+            }
+            if (box.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
+                killBoxList.add(box)
+            }
+            break
+        }
+        for (i in item.x downTo 0) {
+            val box = boxMap[Pair(i - 1, item.y)] ?: break
+            if (box.chessMan == null) {
+                moveBoxList.add(box)
+                continue
+            }
+            if (box.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
+                killBoxList.add(box)
+            }
+            break
+        }
+        for (i in item.y downTo 0) {
+            val box = boxMap[Pair(item.x, i - 1)] ?: break
+            if (box.chessMan == null) {
+                moveBoxList.add(box)
+                continue
+            }
+            if (box.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
+                killBoxList.add(box)
+            }
+            break
+        }
     }
 
     override fun initListener() {
