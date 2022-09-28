@@ -71,6 +71,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
             is Castle -> onCastleClicked(item)
             is Bishop -> onBishopClicked(item)
             is Queen -> onQueenClicked(item)
+            is King -> onKingClicked(item)
         }
         moveBoxList.forEach {
             it.canMove = true
@@ -127,6 +128,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
         onBishopClicked(item)
     }
 
+    private fun onKingClicked(item: Box) {
+        addActionList(Pair(item.x, item.y + 1))
+        addActionList(Pair(item.x, item.y - 1))
+        addActionList(Pair(item.x + 1, item.y + 1))
+        addActionList(Pair(item.x + 1, item.y))
+        addActionList(Pair(item.x + 1, item.y - 1))
+        addActionList(Pair(item.x - 1, item.y + 1))
+        addActionList(Pair(item.x - 1, item.y))
+        addActionList(Pair(item.x - 1, item.y - 1))
+    }
+
     private fun addActionList(getKey: (Int) -> Pair<Int, Int>) {
         for (i in 1..7) {
             val box = boxMap[getKey(i)] ?: break
@@ -138,6 +150,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
                 killBoxList.add(box)
             }
             break
+        }
+    }
+
+    private fun addActionList(key: Pair<Int, Int>) {
+        boxMap[key]?.let {
+            if (it.chessMan == null) {
+                moveBoxList.add(it)
+            }
+            if (it.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
+                killBoxList.add(it)
+            }
         }
     }
 
