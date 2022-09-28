@@ -49,7 +49,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
             }
             return
         }
-        if (item.chessMan == null || currentBoxSelected == item || item.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
+        if (item.chessMan == null || item.chessMan.isRival()) {
             return
         }
         moveBoxList.forEach {
@@ -62,13 +62,18 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
         }
         moveBoxList.clear()
         killBoxList.clear()
-        item.isClicked = true
-        item.notifyChanged(boxAdapter)
         currentBoxSelected?.isClicked = false
         currentBoxSelected?.notifyChanged(boxAdapter)
+        if (currentBoxSelected == item) {
+            currentBoxSelected = null
+            return
+        }
+        item.isClicked = true
+        item.notifyChanged(boxAdapter)
         when (item.chessMan) {
             is Pawn -> onPawnClicked(item)
             is Castle -> onCastleClicked(item)
+            is Knight -> onKnightClicked(item)
             is Bishop -> onBishopClicked(item)
             is Queen -> onQueenClicked(item)
             is King -> onKingClicked(item)
@@ -85,28 +90,28 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
     }
 
     private fun onPawnClicked(item: Box) {
-        boxMap[Pair(item.x, item.y + 1)]?.let {
-            if (it.chessMan == null) {
-                moveBoxList.add(it)
-            }
-        }
-        if (item.y == 1) {
-            boxMap[Pair(item.x, item.y + 2)]?.let {
+        fun addMoveList(key: Pair<Int, Int>) {
+            boxMap[key]?.let {
                 if (it.chessMan == null) {
                     moveBoxList.add(it)
                 }
             }
         }
-        boxMap[Pair(item.x + 1, item.y + 1)]?.let {
-            if (it.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
-                killBoxList.add(it)
+
+        fun addKillList(key: Pair<Int, Int>) {
+            boxMap[key]?.let {
+                if (it.chessMan.isRival()) {
+                    killBoxList.add(it)
+                }
             }
         }
-        boxMap[Pair(item.x - 1, item.y + 1)]?.let {
-            if (it.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
-                killBoxList.add(it)
-            }
+
+        addMoveList(Pair(item.x, item.y + 1))
+        if (item.y == 1 && moveBoxList.isNotEmpty()) {
+            addMoveList(Pair(item.x, item.y + 2))
         }
+        addKillList(Pair(item.x + 1, item.y + 1))
+        addKillList(Pair(item.x - 1, item.y + 1))
     }
 
     private fun onCastleClicked(item: Box) {
@@ -114,6 +119,17 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
         addActionList { Pair(item.x - it, item.y) }
         addActionList { Pair(item.x, item.y + it) }
         addActionList { Pair(item.x, item.y - it) }
+    }
+
+    private fun onKnightClicked(item: Box) {
+        addActionList(Pair(item.x - 1, item.y + 2))
+        addActionList(Pair(item.x - 1, item.y - 2))
+        addActionList(Pair(item.x - 2, item.y + 1))
+        addActionList(Pair(item.x - 2, item.y - 1))
+        addActionList(Pair(item.x + 1, item.y + 2))
+        addActionList(Pair(item.x + 1, item.y - 2))
+        addActionList(Pair(item.x + 2, item.y + 1))
+        addActionList(Pair(item.x + 2, item.y - 1))
     }
 
     private fun onBishopClicked(item: Box) {
@@ -146,7 +162,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
                 moveBoxList.add(box)
                 continue
             }
-            if (box.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
+            if (box.chessMan.isRival()) {
                 killBoxList.add(box)
             }
             break
@@ -158,7 +174,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
             if (it.chessMan == null) {
                 moveBoxList.add(it)
             }
-            if (it.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
+            if (it.chessMan.isRival()) {
                 killBoxList.add(it)
             }
         }
