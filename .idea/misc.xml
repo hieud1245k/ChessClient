@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/bg_border_black_2.xml" value="0.2135" />
+        <entry key="app/src/main/res/drawable/bg_can_kill.xml" value="0.276" />
+        <entry key="app/src/main/res/drawable/bg_can_move.xml" value="0.2865" />
         <entry key="app/src/main/res/drawable/ic_bishop.xml" value="0.2145" />
         <entry key="app/src/main/res/drawable/ic_castle.xml" value="0.23" />
         <entry key="app/src/main/res/drawable/ic_horse.xml" value="0.23" />

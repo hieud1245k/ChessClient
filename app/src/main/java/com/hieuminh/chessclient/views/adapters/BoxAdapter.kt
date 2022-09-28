@@ -17,8 +17,8 @@ class BoxAdapter(private val size: Int) : BaseAdapter<Box>() {
     inner class BoxViewHolder(private val binding: ItemBoxBinding) : BaseViewHolder(binding.root) {
         override fun bind(data: Box) {
             val bgColorResId = when {
-                data.canKill -> R.color.colorLightRed
-                data.canMove -> R.color.colorLightYellow
+                data.canKill -> R.drawable.bg_can_kill
+                data.canMove -> R.drawable.bg_can_move
                 data.isClicked -> R.color.colorLightGreen
                 else -> if (data.x.plus(data.y).rem(2) == 1) R.color.white else R.color.colorWeighGreen
             }

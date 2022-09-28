@@ -6,10 +6,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.hieuminh.chessclient.common.enums.ChessManType
 import com.hieuminh.chessclient.common.enums.PlayerType
 import com.hieuminh.chessclient.databinding.ActivityMainBinding
-import com.hieuminh.chessclient.models.Bishop
-import com.hieuminh.chessclient.models.Box
-import com.hieuminh.chessclient.models.Castle
-import com.hieuminh.chessclient.models.Pawn
+import com.hieuminh.chessclient.models.*
 import com.hieuminh.chessclient.utils.ViewUtils
 import com.hieuminh.chessclient.views.activitys.base.BaseActivity
 import com.hieuminh.chessclient.views.adapters.BoxAdapter
@@ -73,6 +70,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
             is Pawn -> onPawnClicked(item)
             is Castle -> onCastleClicked(item)
             is Bishop -> onBishopClicked(item)
+            is Queen -> onQueenClicked(item)
         }
         moveBoxList.forEach {
             it.canMove = true
@@ -122,6 +120,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
         addActionList { Pair(item.x + it, item.y - it) }
         addActionList { Pair(item.x - it, item.y + it) }
         addActionList { Pair(item.x - it, item.y - it) }
+    }
+
+    private fun onQueenClicked(item: Box) {
+        onCastleClicked(item)
+        onBishopClicked(item)
     }
 
     private fun addActionList(getKey: (Int) -> Pair<Int, Int>) {
