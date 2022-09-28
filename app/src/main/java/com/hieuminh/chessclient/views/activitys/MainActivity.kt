@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.hieuminh.chessclient.common.enums.ChessManType
 import com.hieuminh.chessclient.common.enums.PlayerType
 import com.hieuminh.chessclient.databinding.ActivityMainBinding
+import com.hieuminh.chessclient.models.Bishop
 import com.hieuminh.chessclient.models.Box
 import com.hieuminh.chessclient.models.Castle
 import com.hieuminh.chessclient.models.Pawn
@@ -71,6 +72,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
         when (item.chessMan) {
             is Pawn -> onPawnClicked(item)
             is Castle -> onCastleClicked(item)
+            is Bishop -> onBishopClicked(item)
         }
         moveBoxList.forEach {
             it.canMove = true
@@ -109,41 +111,22 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
     }
 
     private fun onCastleClicked(item: Box) {
-        for (i in item.x..7) {
-            val box = boxMap[Pair(i + 1, item.y)] ?: break
-            if (box.chessMan == null) {
-                moveBoxList.add(box)
-                continue
-            }
-            if (box.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
-                killBoxList.add(box)
-            }
-            break
-        }
-        for (i in item.y..7) {
-            val box = boxMap[Pair(item.x, i + 1)] ?: break
-            if (box.chessMan == null) {
-                moveBoxList.add(box)
-                continue
-            }
-            if (box.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
-                killBoxList.add(box)
-            }
-            break
-        }
-        for (i in item.x downTo 0) {
-            val box = boxMap[Pair(i - 1, item.y)] ?: break
-            if (box.chessMan == null) {
-                moveBoxList.add(box)
-                continue
-            }
-            if (box.chessMan?.playerType == PlayerType.PLAYER_SECOND) {
-                killBoxList.add(box)
-            }
-            break
-        }
-        for (i in item.y downTo 0) {
-            val box = boxMap[Pair(item.x, i - 1)] ?: break
+        addActionList { Pair(item.x + it, item.y) }
+        addActionList { Pair(item.x - it, item.y) }
+        addActionList { Pair(item.x, item.y + it) }
+        addActionList { Pair(item.x, item.y - it) }
+    }
+
+    private fun onBishopClicked(item: Box) {
+        addActionList { Pair(item.x + it, item.y + it) }
+        addActionList { Pair(item.x + it, item.y - it) }
+        addActionList { Pair(item.x - it, item.y + it) }
+        addActionList { Pair(item.x - it, item.y - it) }
+    }
+
+    private fun addActionList(getKey: (Int) -> Pair<Int, Int>) {
+        for (i in 1..7) {
+            val box = boxMap[getKey(i)] ?: break
             if (box.chessMan == null) {
                 moveBoxList.add(box)
                 continue
