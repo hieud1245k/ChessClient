@@ -16,5 +16,9 @@ enum class ChessManType(val newInstance: () -> ChessMan) {
                 Pair(index, chessManType)
             }.toMap()
         }
+
+        fun getGeneralPromotionList(): List<ChessManType> {
+            return listOf(CASTLE, KNIGHT, BISHOP, QUEEN)
+        }
     }
 }

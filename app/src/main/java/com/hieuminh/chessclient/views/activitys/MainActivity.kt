@@ -11,6 +11,7 @@ import com.hieuminh.chessclient.utils.ViewUtils
 import com.hieuminh.chessclient.views.activitys.base.BaseActivity
 import com.hieuminh.chessclient.views.adapters.BoxAdapter
 import com.hieuminh.chessclient.views.adapters.base.BaseAdapter
+import com.hieuminh.chessclient.views.fragments.dialogs.PawnPromotionFragment
 import kotlin.math.min
 
 class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventListener<Box> {
@@ -39,29 +40,20 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
                 notifyChanged(boxAdapter)
             }
             currentBoxSelected = null
-            killBoxList.forEach {
-                it.canKill = false
-                it.notifyChanged(boxAdapter)
-            }
-            moveBoxList.forEach {
-                it.canMove = false
-                it.notifyChanged(boxAdapter)
+            resetActionList()
+            if (item.y == 7 && item.chessMan is Pawn) {
+                promotePawn(item)
             }
             return
         }
         if (item.chessMan == null || item.chessMan.isRival()) {
             return
         }
-        moveBoxList.forEach {
-            it.canMove = false
-            it.notifyChanged(boxAdapter)
-        }
-        killBoxList.forEach {
-            it.canKill = false
-            it.notifyChanged(boxAdapter)
-        }
-        moveBoxList.clear()
-        killBoxList.clear()
+        resetActionList()
+        onChessmanClicked(item)
+    }
+
+    private fun onChessmanClicked(item: Box) {
         currentBoxSelected?.isClicked = false
         currentBoxSelected?.notifyChanged(boxAdapter)
         if (currentBoxSelected == item) {
@@ -87,6 +79,30 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
             it.notifyChanged(boxAdapter)
         }
         currentBoxSelected = item
+    }
+
+    private fun promotePawn(box: Box) {
+        val pawnPromotionFragment = PawnPromotionFragment()
+        pawnPromotionFragment.setGeneralItemListener(object : BaseAdapter.ItemEventListener<ChessMan> {
+            override fun onItemClick(item: ChessMan, position: Int) {
+                box.chessMan = item
+                box.notifyChanged(boxAdapter)
+            }
+        })
+        pawnPromotionFragment.show(supportFragmentManager, null)
+    }
+
+    private fun resetActionList() {
+        moveBoxList.forEach {
+            it.canMove = false
+            it.notifyChanged(boxAdapter)
+        }
+        killBoxList.forEach {
+            it.canKill = false
+            it.notifyChanged(boxAdapter)
+        }
+        moveBoxList.clear()
+        killBoxList.clear()
     }
 
     private fun onPawnClicked(item: Box) {
@@ -205,8 +221,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
                 val box = Box(x, y)
                 val chessMain = when (y) {
                     0 -> ChessManType.getMainMap()[x]?.newInstance?.invoke()?.apply { playerType = PlayerType.PLAYER_FIRST }
-                    1 -> ChessManType.PAWN?.newInstance?.invoke()?.apply { playerType = PlayerType.PLAYER_FIRST }
-                    6 -> ChessManType.PAWN?.newInstance?.invoke()?.apply { playerType = PlayerType.PLAYER_SECOND }
+                    1 -> ChessManType.PAWN.newInstance.invoke().apply { playerType = PlayerType.PLAYER_FIRST }
+                    6 -> ChessManType.PAWN.newInstance.invoke().apply { playerType = PlayerType.PLAYER_SECOND }
                     7 -> ChessManType.getMainMap()[x]?.newInstance?.invoke()?.apply { playerType = PlayerType.PLAYER_SECOND }
                     else -> null
                 }
