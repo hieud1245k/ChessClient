@@ -1,6 +1,8 @@
-package com.hieuminh.chessclient.views.activitys.base
+package com.hieuminh.chessclient.views.activities.base
 
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import com.hieuminh.chessclient.interfaces.InitLayout

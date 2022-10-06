@@ -3,4 +3,9 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="promote">Promote</string>
+    <string name="input_name">Input name:</string>
+    <string name="input_your_name">Input your name</string>
+    <string name="name_example">Hieu Nguyen</string>
+    <string name="submit">Submit</string>
+    <string name="vs">VS</string>
 </resources>

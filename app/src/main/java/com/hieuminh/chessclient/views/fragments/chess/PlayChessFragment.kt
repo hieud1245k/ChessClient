@@ -1,20 +1,20 @@
-package com.hieuminh.chessclient.views.activitys
+package com.hieuminh.chessclient.views.fragments.chess
 
 import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.GridLayoutManager
 import com.hieuminh.chessclient.common.enums.ChessManType
 import com.hieuminh.chessclient.common.enums.PlayerType
-import com.hieuminh.chessclient.databinding.ActivityMainBinding
+import com.hieuminh.chessclient.databinding.FragmentPlayChessBinding
 import com.hieuminh.chessclient.models.*
 import com.hieuminh.chessclient.utils.ViewUtils
-import com.hieuminh.chessclient.views.activitys.base.BaseActivity
 import com.hieuminh.chessclient.views.adapters.BoxAdapter
 import com.hieuminh.chessclient.views.adapters.base.BaseAdapter
+import com.hieuminh.chessclient.views.fragments.base.BaseFragment
 import com.hieuminh.chessclient.views.fragments.dialogs.PawnPromotionFragment
 import kotlin.math.min
 
-class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventListener<Box> {
+class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.ItemEventListener<Box> {
     private lateinit var boxAdapter: BoxAdapter
     private lateinit var boxList: MutableList<Box>
     private lateinit var boxMap: Map<Pair<Int, Int>, Box>
@@ -23,7 +23,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
     private val moveBoxList = mutableListOf<Box>()
     private val killBoxList = mutableListOf<Box>()
 
-    override fun getViewBinding() = ActivityMainBinding.inflate(layoutInflater)
+    override fun getViewBinding() = FragmentPlayChessBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         initData()
@@ -89,7 +89,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
                 box.notifyChanged(boxAdapter)
             }
         })
-        pawnPromotionFragment.show(supportFragmentManager, null)
+        pawnPromotionFragment.show(childFragmentManager, null)
     }
 
     private fun resetActionList() {
@@ -200,7 +200,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(), BaseAdapter.ItemEventL
     }
 
     override fun initView() {
-        val size = min(ViewUtils.getScreenWidth(this), ViewUtils.getScreenHeight(this)) - 50
+        val size = min(ViewUtils.getScreenWidth(activity), ViewUtils.getScreenHeight(activity)) - 50
         boxAdapter = BoxAdapter(size / 8)
         boxAdapter.updateData(boxList)
         boxAdapter.setItemListener(this)
