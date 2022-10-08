@@ -15,10 +15,10 @@
         android:paddingHorizontal="@dimen/dp_16">
 
         <TextView
+            android:id="@+id/tv_title"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
-            android:text="Xin chao, Hieu Minh"
             android:textColor="@color/white"
             android:textSize="@dimen/sp_16" />
 

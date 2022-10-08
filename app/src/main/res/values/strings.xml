@@ -8,4 +8,5 @@
     <string name="name_example">Hieu Nguyen</string>
     <string name="submit">Submit</string>
     <string name="vs">VS</string>
+    <string name="hello_s">Hello, %s</string>
 </resources>

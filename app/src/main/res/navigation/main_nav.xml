@@ -22,6 +22,9 @@
         <action
             android:id="@+id/action_homeFragment_to_playChessFragment"
             app:destination="@id/playChessFragment" />
+        <argument
+            android:name="name"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/playChessFragment"

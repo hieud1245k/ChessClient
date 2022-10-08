@@ -1,5 +1,5 @@
 package com.hieuminh.chessclient.common.constants
 
 object UrlConstants {
-    const val WEB_SOCKET_URL = "http://"
+    const val LOCAL_API_URL = "http://192.168.1.9:8080"
 }
