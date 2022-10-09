@@ -30,5 +30,9 @@
         android:id="@+id/playChessFragment"
         android:name="com.hieuminh.chessclient.views.fragments.chess.PlayChessFragment"
         android:label="fragment_play_chess"
-        tools:layout="@layout/fragment_play_chess" />
+        tools:layout="@layout/fragment_play_chess" >
+        <argument
+            android:name="room"
+            app:argType="com.hieuminh.chessclient.models.Room" />
+    </fragment>
 </navigation>

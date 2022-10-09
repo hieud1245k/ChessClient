@@ -9,8 +9,11 @@ import retrofit2.http.Query
 
 interface ChessService {
     @POST("player-name")
-    fun savePlayerName(@Query("name") name: String): Deferred<JSONObject>
+    fun savePlayerNameAsync(@Query("name") name: String): Deferred<JSONObject>
 
     @GET("api/rooms/")
-    fun getRoomList(): Deferred<List<Room>>
+    fun getRoomListAsync(): Deferred<List<Room>>
+
+    @POST("api/rooms/")
+    fun createNewRoomAsync(): Deferred<Room>
 }

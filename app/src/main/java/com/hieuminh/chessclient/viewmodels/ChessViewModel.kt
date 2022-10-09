@@ -12,12 +12,9 @@ import kotlinx.coroutines.launch
 
 class ChessViewModel(private val repository: ChessRepository = ChessRepositoryImpl()) : ViewModel() {
     private val roomListLiveData = MutableLiveData<List<Room>>()
+    private val newRoomLiveData = MutableLiveData<Room>()
 
-    init {
-        fetchRoomList()
-    }
-
-    private fun fetchRoomList() {
+    fun fetchRoomList() : MutableLiveData<List<Room>> {
         viewModelScope.launch {
             val result = repository.getRoomList()
 
@@ -31,9 +28,23 @@ class ChessViewModel(private val repository: ChessRepository = ChessRepositoryIm
                 }
             }
         }
+        return roomListLiveData
     }
 
-    fun getRoomList(): LiveData<List<Room>> {
-        return roomListLiveData
+    fun createNewRoom(): MutableLiveData<Room> {
+        viewModelScope.launch {
+            val result = repository.createNewRoom()
+
+            when {
+                result.isSuccess -> {
+                    val room = result.getOrNull() ?: return@launch
+                    newRoomLiveData.postValue(room                                                                                                                                                                                                              )
+                }
+                else -> {
+                    Log.d("ERROR", result.exceptionOrNull()?.message ?: "")
+                }
+            }
+        }
+        return newRoomLiveData
     }
 }

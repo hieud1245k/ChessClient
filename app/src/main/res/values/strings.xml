@@ -9,4 +9,15 @@
     <string name="submit">Submit</string>
     <string name="vs">VS</string>
     <string name="hello_s">Hello, %s</string>
+    <string name="play_now">Play now</string>
+    <string name="add_new_room">Add new room</string>
+    <string name="no_room">No room</string>
+    <string name="no_room_data">No room data</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="notice">Notice</string>
+    <string name="are_you_sure_you_want_to_create_new_room">Are you sure you want to create new room?</string>
+    <string name="find_room">Find room</string>
+    <string name="search">Search</string>
+    <string name="find">Find</string>
 </resources>
