@@ -14,9 +14,17 @@ class ChessRepositoryImpl(private val service: ChessService = ApiClientProvider.
         }
     }
 
-    override suspend fun createNewRoom(): Result<Room> {
+    override suspend fun createNewRoom(name: String): Result<Room> {
         return try {
-            Result.success(service.createNewRoomAsync().await())
+            Result.success(service.createNewRoomAsync(name).await())
+        } catch (throwable: Throwable) {
+            Result.failure(throwable)
+        }
+    }
+
+    override suspend fun joinRoom(id: Long, name: String): Result<Room> {
+        return try {
+            Result.success(service.joinRoomAsync(id, name).await())
         } catch (throwable: Throwable) {
             Result.failure(throwable)
         }

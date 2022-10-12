@@ -19,7 +19,7 @@ import com.hieuminh.chessclient.views.fragments.base.BaseFragment
 
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventListener<Room> {
-    private var name: String? = null
+    private lateinit var name: String
     private lateinit var chessViewModel: ChessViewModel
     private lateinit var roomAdapter: RoomAdapter
 
@@ -39,7 +39,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
     }
 
     override fun onItemClick(item: Room, position: Int) {
-        goToPlayChess(item)
+        chessViewModel.joinRoom(item.id ?: return, name).observe(this) { room ->
+            goToPlayChess(room)
+        }
     }
 
     override fun initListener() {
@@ -73,7 +75,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
     }
 
     private fun createNewRoom() {
-        chessViewModel.createNewRoom().observe(this) { room ->
+        chessViewModel.createNewRoom(name).observe(this) { room ->
             goToPlayChess(room)
         }
     }
@@ -89,7 +91,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
     }
 
     private fun goToPlayChess(room: Room) {
-        val action = HomeFragmentDirections.actionHomeFragmentToPlayChessFragment(room)
+        val action = HomeFragmentDirections.actionHomeFragmentToPlayChessFragment(room, name)
         view?.navController?.navigate(action)
     }
 

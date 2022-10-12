@@ -3,9 +3,7 @@ package com.hieuminh.chessclient.services
 import com.hieuminh.chessclient.models.Room
 import kotlinx.coroutines.Deferred
 import org.json.JSONObject
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface ChessService {
     @POST("player-name")
@@ -15,5 +13,13 @@ interface ChessService {
     fun getRoomListAsync(): Deferred<List<Room>>
 
     @POST("api/rooms/")
-    fun createNewRoomAsync(): Deferred<Room>
+    @FormUrlEncoded
+    fun createNewRoomAsync(@Field("name") name: String): Deferred<Room>
+
+    @PUT("api/rooms/{id}")
+    @FormUrlEncoded
+    fun joinRoomAsync(@Path("id") id: Long, @Field("name") name: String): Deferred<Room>
+
+    @PUT("/api/rooms/{id}")
+    fun run(@Path("id") id: Long, @Field("name") name: String)
 }

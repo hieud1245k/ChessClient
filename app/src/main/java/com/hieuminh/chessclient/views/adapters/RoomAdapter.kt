@@ -14,11 +14,10 @@ class RoomAdapter : BaseAdapter<Room>() {
     }
 
     inner class RoomViewHolder(private val binding: ItemRoomBinding) : BaseViewHolder(binding.root) {
-        @SuppressLint("SetTextI18n")
         override fun bind(data: Room) {
-            binding.tvRoomId.text = "Room id: ${data.id}"
-            binding.ivPlayer1.setColorFilter(if (data.playerFirstSessionId.isNullOrEmpty()) R.color.black else R.color.colorOrange)
-            binding.ivPlayer2.setColorFilter(if (data.playerSecondSessionId.isNullOrEmpty()) R.color.black else R.color.colorOrange)
+            binding.tvRoomId.text = data.roomTextId
+            binding.ivPlayer1.setColorFilter(if (data.playerFirstName.isNullOrEmpty()) R.color.black else R.color.colorOrange)
+            binding.ivPlayer2.setColorFilter(if (data.playerFirstName.isNullOrEmpty()) R.color.black else R.color.colorOrange)
         }
     }
 }

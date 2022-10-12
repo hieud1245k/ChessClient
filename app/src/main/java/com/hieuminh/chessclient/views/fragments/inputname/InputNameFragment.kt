@@ -26,10 +26,11 @@ class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
     }
 
     private fun onTextChangedListener(text: String?) {
+
     }
 
     private fun submit() {
-        (activity as? BaseActivity<*>)?.openInputNameSocket("name", webSocketListener)
+        (activity as? BaseActivity<*>)?.openSocket("name", webSocketListener)
     }
 
     private val webSocketListener = object : WebSocketListener() {

@@ -1,7 +1,6 @@
 package com.hieuminh.chessclient.viewmodels
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,8 +12,9 @@ import kotlinx.coroutines.launch
 class ChessViewModel(private val repository: ChessRepository = ChessRepositoryImpl()) : ViewModel() {
     private val roomListLiveData = MutableLiveData<List<Room>>()
     private val newRoomLiveData = MutableLiveData<Room>()
+    private val joinRoomLiveData = MutableLiveData<Room>()
 
-    fun fetchRoomList() : MutableLiveData<List<Room>> {
+    fun fetchRoomList(): MutableLiveData<List<Room>> {
         viewModelScope.launch {
             val result = repository.getRoomList()
 
@@ -31,14 +31,14 @@ class ChessViewModel(private val repository: ChessRepository = ChessRepositoryIm
         return roomListLiveData
     }
 
-    fun createNewRoom(): MutableLiveData<Room> {
+    fun createNewRoom(name: String): MutableLiveData<Room> {
         viewModelScope.launch {
-            val result = repository.createNewRoom()
+            val result = repository.createNewRoom(name)
 
             when {
                 result.isSuccess -> {
                     val room = result.getOrNull() ?: return@launch
-                    newRoomLiveData.postValue(room                                                                                                                                                                                                              )
+                    newRoomLiveData.postValue(room)
                 }
                 else -> {
                     Log.d("ERROR", result.exceptionOrNull()?.message ?: "")
@@ -46,5 +46,22 @@ class ChessViewModel(private val repository: ChessRepository = ChessRepositoryIm
             }
         }
         return newRoomLiveData
+    }
+
+    fun joinRoom(id: Long, name: String): MutableLiveData<Room> {
+        viewModelScope.launch {
+            val result = repository.joinRoom(id, name)
+
+            when {
+                result.isSuccess -> {
+                    val room = result.getOrNull() ?: return@launch
+                    joinRoomLiveData.postValue(room)
+                }
+                else -> {
+                    Log.d("ERROR", result.exceptionOrNull()?.message ?: "")
+                }
+            }
+        }
+        return joinRoomLiveData
     }
 }

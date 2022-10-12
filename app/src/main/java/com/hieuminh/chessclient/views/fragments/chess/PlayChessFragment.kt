@@ -3,15 +3,22 @@ package com.hieuminh.chessclient.views.fragments.chess
 import android.os.Bundle
 import android.util.Log
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.gson.Gson
 import com.hieuminh.chessclient.common.enums.ChessManType
 import com.hieuminh.chessclient.common.enums.PlayerType
 import com.hieuminh.chessclient.databinding.FragmentPlayChessBinding
 import com.hieuminh.chessclient.models.*
+import com.hieuminh.chessclient.models.request.ChessRequest
+import com.hieuminh.chessclient.utils.JsonUtils
 import com.hieuminh.chessclient.utils.ViewUtils
+import com.hieuminh.chessclient.views.activities.base.BaseActivity
 import com.hieuminh.chessclient.views.adapters.BoxAdapter
 import com.hieuminh.chessclient.views.adapters.base.BaseAdapter
 import com.hieuminh.chessclient.views.fragments.base.BaseFragment
 import com.hieuminh.chessclient.views.fragments.dialogs.PawnPromotionFragment
+import okhttp3.Response
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
 import kotlin.math.min
 
 class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.ItemEventListener<Box> {
@@ -23,16 +30,55 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     private val moveBoxList = mutableListOf<Box>()
     private val killBoxList = mutableListOf<Box>()
 
+    private lateinit var room: Room
+    private lateinit var name: String
+
+    private var chessWebSocket: WebSocket? = null
+
+    private val webSocketListener = object : WebSocketListener() {
+        override fun onOpen(webSocket: WebSocket, response: Response) {
+            chessWebSocket = webSocket
+            webSocket.send("${name}__")
+        }
+
+        override fun onMessage(webSocket: WebSocket, text: String) {
+            val chessRequest = JsonUtils.fromJson<ChessRequest>(text) ?: return
+            val fromBox = chessRequest.from
+            boxMap[Pair(fromBox?.x ?: 0, fromBox?.y ?: 0)]?.run {
+                chessMan = null
+            }
+            val toBox = chessRequest.to
+            boxMap[Pair(toBox?.x ?: 0, toBox?.y ?: 0)]?.run {
+                chessMan = fromBox?.chessMan
+            }
+            boxAdapter.notifyDataSetChanged()
+            super.onMessage(webSocket, text)
+        }
+
+        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            super.onFailure(webSocket, t, response)
+        }
+    }
+
     override fun getViewBinding() = FragmentPlayChessBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         initData()
         super.onCreate(savedInstanceState)
+        val args = PlayChessFragmentArgs.fromBundle(requireArguments())
+        room = args.room
+        name = args.name
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as? BaseActivity<*>)?.openSocket("chessman", webSocketListener)
     }
 
     override fun onItemClick(item: Box, position: Int) {
         Log.d("POSITION", position.toString())
         if (item.canKill || item.canMove) {
+            sendChessmanAction(item)
             item.chessMan = currentBoxSelected?.chessMan
             currentBoxSelected?.run {
                 chessMan = null
@@ -51,6 +97,15 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         }
         resetActionList()
         onChessmanClicked(item)
+    }
+
+    private fun sendChessmanAction(item: Box) {
+        val chessRequest = ChessRequest()
+        chessRequest.from = currentBoxSelected?.copy()
+        chessRequest.to = item.copy()
+        chessRequest.playerName = room.getRivalPlayerName(name)
+        val request = Gson().toJson(chessRequest)
+        chessWebSocket?.send(request)
     }
 
     private fun onChessmanClicked(item: Box) {
@@ -200,6 +255,8 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     }
 
     override fun initView() {
+        binding.ivRoomId.text = room.roomTextId
+
         val size = min(ViewUtils.getScreenWidth(activity), ViewUtils.getScreenHeight(activity)) - 50
         boxAdapter = BoxAdapter(size / 8)
         boxAdapter.updateData(boxList)

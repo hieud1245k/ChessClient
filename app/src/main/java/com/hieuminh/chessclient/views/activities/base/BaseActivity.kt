@@ -20,13 +20,12 @@ abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), InitL
         binding = getViewBinding()
         setContentView(binding.root)
         client = OkHttpClient()
-        initListener()
         initView()
+        initListener()
     }
 
-    fun openInputNameSocket(path: String, listener: WebSocketListener) {
+    fun openSocket(path: String, listener: WebSocketListener) {
         val request = Request.Builder().url("${UrlConstants.LOCAL_API_URL}/$path").build()
         client.newWebSocket(request, listener)
-        client.dispatcher.executorService.shutdown()
     }
 }

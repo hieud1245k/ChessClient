@@ -34,5 +34,8 @@
         <argument
             android:name="room"
             app:argType="com.hieuminh.chessclient.models.Room" />
+        <argument
+            android:name="name"
+            app:argType="string" />
     </fragment>
 </navigation>

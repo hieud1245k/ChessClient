@@ -2,12 +2,23 @@ package com.hieuminh.chessclient.models
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.google.gson.annotations.SerializedName
 
 class Room() : Parcelable {
     var id: Long? = null
-    var playerFirstSessionId: String? = null
-    var playerSecondSessionId: String? = null
+
+    var playerFirstName: String? = null
+
+    var playerSecondName: String? = null
+
+    val roomTextId: String
+        get() = "Room id: $id"
+
+    fun getRivalPlayerName(name: String?): String? {
+        if (name.equals(playerFirstName)) {
+            return playerSecondName
+        }
+        return playerFirstName
+    }
 
     constructor(parcel: Parcel) : this()
 
