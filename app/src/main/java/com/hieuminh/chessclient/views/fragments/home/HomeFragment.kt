@@ -35,22 +35,40 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
 
     override fun onResume() {
         super.onResume()
-        getRoomList()
+        chessViewModel.fetchRoomList()
     }
 
     override fun onItemClick(item: Room, position: Int) {
-        chessViewModel.joinRoom(item.id ?: return, name).observe(this) { room ->
-            goToPlayChess(room)
-        }
+        chessViewModel.joinRoom(item.id ?: return, name)
     }
 
     override fun initListener() {
         binding.btPlayNow.setOnClickListener { }
         binding.btCreateNewRoom.setOnClickListener { showConfirmCreateNewRoomDialog() }
+        binding.sflRoomLisRefresh.setOnRefreshListener {
+            binding.sflRoomLisRefresh.isRefreshing = false
+            chessViewModel.fetchRoomList()
+        }
+    }
+
+    private fun observerLiveData() {
+        chessViewModel = ViewModelProvider(this)[ChessViewModel::class.java]
+
+        chessViewModel.roomListLiveData.observe(this) { roomList ->
+            roomAdapter.updateData(roomList.toMutableList())
+        }
+
+        chessViewModel.joinRoomLiveData.observe(this) { room ->
+            goToPlayChess(room, false)
+        }
+
+        chessViewModel.newRoomLiveData.observe(this) { room ->
+            goToPlayChess(room, true)
+        }
     }
 
     override fun initView() {
-        chessViewModel = ViewModelProvider(this)[ChessViewModel::class.java]
+        observerLiveData()
 
         binding.tvTitle.text = String.format(resources.getString(R.string.hello_s), name)
 
@@ -68,16 +86,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
         binding.rlRoomList.adapter = roomAdapter
     }
 
-    private fun getRoomList() {
-        chessViewModel.fetchRoomList().observe(this) { roomList ->
-            roomAdapter.updateData(roomList.toMutableList())
-        }
-    }
-
     private fun createNewRoom() {
-        chessViewModel.createNewRoom(name).observe(this) { room ->
-            goToPlayChess(room)
-        }
+        chessViewModel.createNewRoom(name)
     }
 
     private fun showConfirmCreateNewRoomDialog() {
@@ -90,8 +100,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
             .show()
     }
 
-    private fun goToPlayChess(room: Room) {
-        val action = HomeFragmentDirections.actionHomeFragmentToPlayChessFragment(room, name)
+    private fun goToPlayChess(room: Room, createRoom: Boolean) {
+        val action = HomeFragmentDirections.actionHomeFragmentToPlayChessFragment(room, name, createRoom)
         view?.navController?.navigate(action)
     }
 

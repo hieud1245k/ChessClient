@@ -63,11 +63,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rl_room_list"
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/sfl_room_lis_refresh"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="@dimen/dp_16" />
+                android:layout_height="match_parent">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rl_room_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginHorizontal="@dimen/dp_16" />
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
             <LinearLayout
                 android:id="@+id/ll_no_room_data"

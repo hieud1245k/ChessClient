@@ -1,6 +1,6 @@
 package com.hieuminh.chessclient.providers
 
-import com.hieuminh.chessclient.common.constants.UrlConstants
+import com.hieuminh.chessclient.utils.AppUtils
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -26,7 +26,7 @@ object ApiClientProvider {
             appRetrofit = Retrofit.Builder()
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
-                .baseUrl(UrlConstants.LOCAL_API_URL)
+                .baseUrl(AppUtils.getServerUrl())
                 .client(okHttpClient)
                 .build()
         }

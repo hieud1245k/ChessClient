@@ -10,11 +10,11 @@ import com.hieuminh.chessclient.repositories.impl.ChessRepositoryImpl
 import kotlinx.coroutines.launch
 
 class ChessViewModel(private val repository: ChessRepository = ChessRepositoryImpl()) : ViewModel() {
-    private val roomListLiveData = MutableLiveData<List<Room>>()
-    private val newRoomLiveData = MutableLiveData<Room>()
-    private val joinRoomLiveData = MutableLiveData<Room>()
+    val roomListLiveData = MutableLiveData<List<Room>>()
+    val newRoomLiveData = MutableLiveData<Room>()
+    val joinRoomLiveData = MutableLiveData<Room>()
 
-    fun fetchRoomList(): MutableLiveData<List<Room>> {
+    fun fetchRoomList() {
         viewModelScope.launch {
             val result = repository.getRoomList()
 
@@ -28,10 +28,9 @@ class ChessViewModel(private val repository: ChessRepository = ChessRepositoryIm
                 }
             }
         }
-        return roomListLiveData
     }
 
-    fun createNewRoom(name: String): MutableLiveData<Room> {
+    fun createNewRoom(name: String) {
         viewModelScope.launch {
             val result = repository.createNewRoom(name)
 
@@ -45,10 +44,9 @@ class ChessViewModel(private val repository: ChessRepository = ChessRepositoryIm
                 }
             }
         }
-        return newRoomLiveData
     }
 
-    fun joinRoom(id: Long, name: String): MutableLiveData<Room> {
+    fun joinRoom(id: Long, name: String) {
         viewModelScope.launch {
             val result = repository.joinRoom(id, name)
 
@@ -62,6 +60,5 @@ class ChessViewModel(private val repository: ChessRepository = ChessRepositoryIm
                 }
             }
         }
-        return joinRoomLiveData
     }
 }

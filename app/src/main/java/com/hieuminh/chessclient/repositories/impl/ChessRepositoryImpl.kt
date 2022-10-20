@@ -8,7 +8,8 @@ import com.hieuminh.chessclient.services.ChessService
 class ChessRepositoryImpl(private val service: ChessService = ApiClientProvider.getService()) : ChessRepository {
     override suspend fun getRoomList(): Result<List<Room>> {
         return try {
-            Result.success(service.getRoomListAsync().await())
+            val roomList = service.getRoomListAsync().await()
+            Result.success(roomList)
         } catch (throwable: Throwable) {
             Result.failure(throwable)
         }
