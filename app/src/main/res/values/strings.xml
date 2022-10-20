@@ -20,4 +20,7 @@
     <string name="find_room">Find room</string>
     <string name="search">Search</string>
     <string name="find">Find</string>
+    <string name="input_ip_address">Input Ip address</string>
+    <string name="ip_address">Ip address:</string>
+    <string name="input_port">Input port</string>
 </resources>

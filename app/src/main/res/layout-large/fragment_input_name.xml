@@ -19,24 +19,61 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/dp_24"
             android:background="@color/white"
             android:gravity="center"
-            android:orientation="vertical"
-            android:padding="@dimen/dp_16">
+            android:orientation="vertical">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:text="@string/ip_address"
+                android:textSize="@dimen/sp_16" />
+
+            <EditText
+                android:id="@+id/et_ip_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_8"
+                android:hint="@string/input_ip_address"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:textSize="@dimen/sp_14" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_10"
                 android:text="@string/input_name"
-                android:textSize="@dimen/sp_18" />
+                android:textSize="@dimen/sp_16" />
+
+            <EditText
+                android:id="@+id/et_port"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_8"
+                android:hint="@string/input_port"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:textSize="@dimen/sp_14" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_10"
+                android:text="@string/input_name"
+                android:textSize="@dimen/sp_16" />
 
             <EditText
                 android:id="@+id/et_input_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dp_12"
+                android:layout_marginTop="@dimen/dp_8"
                 android:hint="@string/input_your_name"
-                android:textSize="@dimen/sp_16" />
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:text="@string/name_example"
+                android:textSize="@dimen/sp_14" />
 
             <Button
                 android:id="@+id/bt_submit"

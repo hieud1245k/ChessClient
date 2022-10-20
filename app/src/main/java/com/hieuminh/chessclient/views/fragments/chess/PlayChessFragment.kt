@@ -2,6 +2,7 @@ package com.hieuminh.chessclient.views.fragments.chess
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.gson.Gson
 import com.hieuminh.chessclient.common.enums.ChessManType
@@ -11,14 +12,12 @@ import com.hieuminh.chessclient.models.*
 import com.hieuminh.chessclient.models.request.ChessRequest
 import com.hieuminh.chessclient.utils.JsonUtils
 import com.hieuminh.chessclient.utils.ViewUtils
-import com.hieuminh.chessclient.views.activities.base.BaseActivity
 import com.hieuminh.chessclient.views.adapters.BoxAdapter
 import com.hieuminh.chessclient.views.adapters.base.BaseAdapter
 import com.hieuminh.chessclient.views.fragments.base.BaseFragment
 import com.hieuminh.chessclient.views.fragments.dialogs.PawnPromotionFragment
-import okhttp3.Response
-import okhttp3.WebSocket
-import okhttp3.WebSocketListener
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import kotlin.math.min
 
 class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.ItemEventListener<Box> {
@@ -33,33 +32,6 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     private lateinit var room: Room
     private lateinit var name: String
 
-    private var chessWebSocket: WebSocket? = null
-
-    private val webSocketListener = object : WebSocketListener() {
-        override fun onOpen(webSocket: WebSocket, response: Response) {
-            chessWebSocket = webSocket
-            webSocket.send("${name}__")
-        }
-
-        override fun onMessage(webSocket: WebSocket, text: String) {
-            val chessRequest = JsonUtils.fromJson<ChessRequest>(text) ?: return
-            val fromBox = chessRequest.from
-            boxMap[Pair(fromBox?.x ?: 0, fromBox?.y ?: 0)]?.run {
-                chessMan = null
-            }
-            val toBox = chessRequest.to
-            boxMap[Pair(toBox?.x ?: 0, toBox?.y ?: 0)]?.run {
-                chessMan = fromBox?.chessMan
-            }
-            boxAdapter.notifyDataSetChanged()
-            super.onMessage(webSocket, text)
-        }
-
-        override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            super.onFailure(webSocket, t, response)
-        }
-    }
-
     override fun getViewBinding() = FragmentPlayChessBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,11 +40,6 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         val args = PlayChessFragmentArgs.fromBundle(requireArguments())
         room = args.room
         name = args.name
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (activity as? BaseActivity<*>)?.openSocket("chessman", webSocketListener)
     }
 
     override fun onItemClick(item: Box, position: Int) {
@@ -105,7 +72,11 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         chessRequest.to = item.copy()
         chessRequest.playerName = room.getRivalPlayerName(name)
         val request = Gson().toJson(chessRequest)
-        chessWebSocket?.send(request)
+        baseActivity?.subscribe { stompClient ->
+            stompClient.send("/app/go-to-box", request).compose(applySchedulers()).subscribe {
+                Toast.makeText(context, "Go to box success", Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     private fun onChessmanClicked(item: Box) {
@@ -252,6 +223,38 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     }
 
     override fun initListener() {
+        baseActivity?.subscribe { stompClient ->
+            stompClient.topic("/queue/go-to-box")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    val chessRequest = JsonUtils.fromJson<ChessRequest>(it.payload) ?: return@subscribe
+                    val name = name
+                    if (!name.equals(chessRequest.playerName)) {
+                        return@subscribe
+                    }
+                    val fromBox = boxMap[Pair(chessRequest.from?.x ?: 0, chessRequest.from?.y ?: 0)]
+                    val toBox = boxMap[Pair(chessRequest.to?.x ?: 0, chessRequest.to?.y ?: 0)]
+
+                    toBox?.chessMan = fromBox?.chessMan
+                    fromBox?.chessMan = null
+                    boxAdapter.notifyDataSetChanged()
+                }, {
+                    Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
+                })
+        }
+        baseActivity?.subscribe { stompClient ->
+            stompClient.topic("/queue/join-room")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ stomMessage ->
+                    JsonUtils.fromJson<Room>(stomMessage.payload)?.let {
+                        room = it
+                    }
+                }, {
+                    Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
+                })
+        }
     }
 
     override fun initView() {

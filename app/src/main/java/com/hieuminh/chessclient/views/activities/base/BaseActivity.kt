@@ -1,16 +1,23 @@
 package com.hieuminh.chessclient.views.activities.base
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
-import com.hieuminh.chessclient.common.constants.UrlConstants
 import com.hieuminh.chessclient.interfaces.InitLayout
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.WebSocketListener
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import ua.naiksoftware.stomp.Stomp
+import ua.naiksoftware.stomp.StompClient
+import ua.naiksoftware.stomp.dto.LifecycleEvent
+import java.util.function.DoublePredicate
 
 abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), InitLayout<VBinding> {
-    protected lateinit var client: OkHttpClient
+    private var stompClient: StompClient? = null
+
+    private var compositeDisposable: CompositeDisposable? = null
 
     lateinit var binding: VBinding
         private set
@@ -19,13 +26,62 @@ abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), InitL
         super.onCreate(savedInstanceState)
         binding = getViewBinding()
         setContentView(binding.root)
-        client = OkHttpClient()
+
         initView()
         initListener()
     }
 
-    fun openSocket(path: String, listener: WebSocketListener) {
-        val request = Request.Builder().url("${UrlConstants.LOCAL_API_URL}/$path").build()
-        client.newWebSocket(request, listener)
+    private fun toast(text: String) {
+        Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun resetSubscriptions() {
+        if (compositeDisposable != null) {
+            compositeDisposable?.dispose()
+        }
+        compositeDisposable = CompositeDisposable()
+    }
+
+    fun connect(ipAddress: String, port: String, success: (StompClient) -> Unit) {
+        if (stompClient != null) {
+            stompClient?.disconnect()
+        }
+        val stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://$ipAddress:$port/ws")
+        this.stompClient = stompClient
+
+        resetSubscriptions()
+
+        val dispLifecycle = stompClient.lifecycle()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { lifecycleEvent ->
+                when (lifecycleEvent.type) {
+                    null -> Unit
+                    LifecycleEvent.Type.OPENED -> {
+                        toast("Stomp connection opened")
+                        success.invoke(stompClient)
+                    }
+                    LifecycleEvent.Type.ERROR -> {
+                        toast("Stomp connection error")
+                    }
+                    LifecycleEvent.Type.CLOSED -> {
+                        toast("Stomp connection closed")
+                    }
+                    LifecycleEvent.Type.FAILED_SERVER_HEARTBEAT -> {
+                        toast("Stomp failed server heartbeat")
+                    }
+                }
+            }
+
+        compositeDisposable?.add(dispLifecycle)
+        stompClient?.connect()
+    }
+
+    fun subscribe(disposable: Disposable) {
+        compositeDisposable?.add(disposable)
+    }
+
+    fun subscribe(predicate: (StompClient) -> Disposable) {
+        compositeDisposable?.add(predicate.invoke(stompClient ?: return))
     }
 }
