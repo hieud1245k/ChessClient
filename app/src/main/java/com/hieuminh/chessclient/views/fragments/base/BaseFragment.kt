@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.hieuminh.chessclient.interfaces.InitLayout
+import com.hieuminh.chessclient.viewmodels.ChessViewModel
 import com.hieuminh.chessclient.views.activities.base.BaseActivity
 import io.reactivex.Completable
 import io.reactivex.CompletableTransformer
@@ -19,6 +20,9 @@ abstract class BaseFragment<VBinding : ViewBinding> : Fragment(), InitLayout<VBi
 
     protected val baseActivity: BaseActivity<*>?
         get() = activity as? BaseActivity<*>
+
+    protected val chessViewModel: ChessViewModel?
+        get() = baseActivity?.chessViewModel
 
     protected fun applySchedulers(): CompletableTransformer {
         return CompletableTransformer { upstream: Completable ->

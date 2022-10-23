@@ -3,8 +3,10 @@ package com.hieuminh.chessclient.views.activities.base
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
 import com.hieuminh.chessclient.interfaces.InitLayout
+import com.hieuminh.chessclient.viewmodels.ChessViewModel
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -12,7 +14,6 @@ import io.reactivex.schedulers.Schedulers
 import ua.naiksoftware.stomp.Stomp
 import ua.naiksoftware.stomp.StompClient
 import ua.naiksoftware.stomp.dto.LifecycleEvent
-import java.util.function.DoublePredicate
 
 abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), InitLayout<VBinding> {
     private var stompClient: StompClient? = null
@@ -22,10 +23,15 @@ abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), InitL
     lateinit var binding: VBinding
         private set
 
+    var chessViewModel: ChessViewModel? = null
+        private set
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = getViewBinding()
         setContentView(binding.root)
+
+        chessViewModel = ViewModelProvider(this)[ChessViewModel::class.java]
 
         initView()
         initListener()
@@ -43,8 +49,9 @@ abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), InitL
     }
 
     fun connect(ipAddress: String, port: String, success: (StompClient) -> Unit) {
-        if (stompClient != null) {
-            stompClient?.disconnect()
+        if (stompClient?.isConnected == true) {
+            success(stompClient!!)
+            return
         }
         val stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://$ipAddress:$port/ws")
         this.stompClient = stompClient

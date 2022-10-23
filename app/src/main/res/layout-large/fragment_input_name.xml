@@ -75,6 +75,16 @@
                 android:text="@string/name_example"
                 android:textSize="@dimen/sp_14" />
 
+            <TextView
+                android:id="@+id/tv_name_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="@dimen/dp_4"
+                android:text="@string/name_is_exist_please_input_another_name"
+                android:textColor="@color/colorRed"
+                android:visibility="gone" />
+
             <Button
                 android:id="@+id/bt_submit"
                 android:layout_width="match_parent"

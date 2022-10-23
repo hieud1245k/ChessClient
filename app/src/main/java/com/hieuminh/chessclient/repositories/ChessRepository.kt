@@ -1,6 +1,7 @@
 package com.hieuminh.chessclient.repositories
 
 import com.hieuminh.chessclient.models.Room
+import com.hieuminh.chessclient.models.response.BaseResponse
 
 interface ChessRepository {
     suspend fun getRoomList(): Result<List<Room>>
@@ -8,4 +9,6 @@ interface ChessRepository {
     suspend fun createNewRoom(name: String): Result<Room>
 
     suspend fun joinRoom(id: Long, name: String): Result<Room>
+
+    suspend fun saveName(name: String) : Result<BaseResponse>
 }

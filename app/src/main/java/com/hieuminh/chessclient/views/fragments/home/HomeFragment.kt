@@ -3,7 +3,6 @@ package com.hieuminh.chessclient.views.fragments.home
 import android.app.AlertDialog
 import android.os.Bundle
 import androidx.core.view.isVisible
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.hieuminh.chessclient.R
@@ -12,7 +11,6 @@ import com.hieuminh.chessclient.common.extensions.ContextExtensions.isTablet
 import com.hieuminh.chessclient.common.extensions.ViewExtensions.navController
 import com.hieuminh.chessclient.databinding.FragmentHomeBinding
 import com.hieuminh.chessclient.models.Room
-import com.hieuminh.chessclient.viewmodels.ChessViewModel
 import com.hieuminh.chessclient.views.adapters.RoomAdapter
 import com.hieuminh.chessclient.views.adapters.base.BaseAdapter
 import com.hieuminh.chessclient.views.fragments.base.BaseFragment
@@ -20,7 +18,6 @@ import com.hieuminh.chessclient.views.fragments.base.BaseFragment
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventListener<Room> {
     private lateinit var name: String
-    private lateinit var chessViewModel: ChessViewModel
     private lateinit var roomAdapter: RoomAdapter
 
     override fun getViewBinding() = FragmentHomeBinding.inflate(layoutInflater)
@@ -35,11 +32,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
 
     override fun onResume() {
         super.onResume()
-        chessViewModel.fetchRoomList()
+        chessViewModel?.fetchRoomList()
     }
 
     override fun onItemClick(item: Room, position: Int) {
-        chessViewModel.joinRoom(item.id ?: return, name)
+        chessViewModel?.joinRoom(item.id ?: return, name)
     }
 
     override fun initListener() {
@@ -47,22 +44,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
         binding.btCreateNewRoom.setOnClickListener { showConfirmCreateNewRoomDialog() }
         binding.sflRoomLisRefresh.setOnRefreshListener {
             binding.sflRoomLisRefresh.isRefreshing = false
-            chessViewModel.fetchRoomList()
+            chessViewModel?.fetchRoomList()
         }
     }
 
     private fun observerLiveData() {
-        chessViewModel = ViewModelProvider(this)[ChessViewModel::class.java]
-
-        chessViewModel.roomListLiveData.observe(this) { roomList ->
+        chessViewModel?.roomListLiveData?.observe(this) { roomList ->
             roomAdapter.updateData(roomList.toMutableList())
         }
 
-        chessViewModel.joinRoomLiveData.observe(this) { room ->
+        chessViewModel?.joinRoomLiveData?.observe(this) { room ->
             goToPlayChess(room, false)
         }
 
-        chessViewModel.newRoomLiveData.observe(this) { room ->
+        chessViewModel?.newRoomLiveData?.observe(this) { room ->
             goToPlayChess(room, true)
         }
     }
@@ -87,7 +82,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
     }
 
     private fun createNewRoom() {
-        chessViewModel.createNewRoom(name)
+        chessViewModel?.createNewRoom(name)
     }
 
     private fun showConfirmCreateNewRoomDialog() {

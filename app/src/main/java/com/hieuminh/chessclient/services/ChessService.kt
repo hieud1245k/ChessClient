@@ -1,13 +1,14 @@
 package com.hieuminh.chessclient.services
 
 import com.hieuminh.chessclient.models.Room
+import com.hieuminh.chessclient.models.response.BaseResponse
 import kotlinx.coroutines.Deferred
 import org.json.JSONObject
 import retrofit2.http.*
 
 interface ChessService {
-    @POST("player-name")
-    fun savePlayerNameAsync(@Query("name") name: String): Deferred<JSONObject>
+    @POST("api/players/name")
+    fun saveNameAsync(@Query("name") name: String): Deferred<BaseResponse>
 
     @GET("api/rooms/")
     fun getRoomListAsync(): Deferred<List<Room>>

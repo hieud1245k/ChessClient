@@ -1,6 +1,7 @@
 package com.hieuminh.chessclient.repositories.impl
 
 import com.hieuminh.chessclient.models.Room
+import com.hieuminh.chessclient.models.response.BaseResponse
 import com.hieuminh.chessclient.providers.ApiClientProvider
 import com.hieuminh.chessclient.repositories.ChessRepository
 import com.hieuminh.chessclient.services.ChessService
@@ -26,6 +27,14 @@ class ChessRepositoryImpl(private val service: ChessService = ApiClientProvider.
     override suspend fun joinRoom(id: Long, name: String): Result<Room> {
         return try {
             Result.success(service.joinRoomAsync(id, name).await())
+        } catch (throwable: Throwable) {
+            Result.failure(throwable)
+        }
+    }
+
+    override suspend fun saveName(name: String): Result<BaseResponse> {
+        return try {
+            Result.success(service.saveNameAsync(name).await())
         } catch (throwable: Throwable) {
             Result.failure(throwable)
         }
