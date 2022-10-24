@@ -77,6 +77,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         chessRequest.from = currentBoxSelected?.copy()
         chessRequest.to = item.copy()
         chessRequest.playerName = room.getRivalPlayerName(name)
+        chessRequest.roomId = room.id
         val request = Gson().toJson(chessRequest)
         baseActivity?.subscribe { stompClient ->
             stompClient.send("/app/go-to-box", request).compose(applySchedulers()).subscribe {
@@ -240,7 +241,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         }
 
         baseActivity?.subscribe { stompClient ->
-            stompClient.topic("/queue/go-to-box")
+            stompClient.topic("/queue/go-to-box/${room.id}")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({
@@ -267,7 +268,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                 })
         }
         baseActivity?.subscribe { stompClient ->
-            stompClient.topic("/queue/join-room")
+            stompClient.topic("/queue/join-room/${room.id}")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ stomMessage ->
@@ -279,7 +280,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                 })
         }
         baseActivity?.subscribe { stompClient ->
-            stompClient.topic("/queue/start-game")
+            stompClient.topic("/queue/start-game/${room.id}")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ stompMessage ->

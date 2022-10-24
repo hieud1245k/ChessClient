@@ -1,12 +1,15 @@
 package com.hieuminh.chessclient.views.fragments.inputname
 
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import com.hieuminh.chessclient.common.constants.UrlConstants
 import com.hieuminh.chessclient.common.extensions.ViewExtensions.navController
 import com.hieuminh.chessclient.databinding.FragmentInputNameBinding
-import com.hieuminh.chessclient.exceptions.CustomException
+import com.hieuminh.chessclient.utils.AppUtils
 import com.hieuminh.chessclient.views.fragments.base.BaseFragment
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 open class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
 
@@ -32,12 +35,33 @@ open class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
         val port = binding.etPort.text.toString().trim()
 
         baseActivity?.connect(ipAddress, port) { stompClient ->
-            chessViewModel?.saveName(username, {
-                val action = InputNameFragmentDirections.actionInputNameFragmentToHomeFragment(username)
-                view?.navController?.navigate(action)
-            }, {
-                binding.tvNameError.isVisible = true
-            })
+            baseActivity?.subscribe {
+                stompClient.topic("/queue/add-username/${AppUtils.getPath(username)}")
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe {
+                        val payLoad = it.payload
+                        when (payLoad) {
+                            username -> {
+                                try {
+                                    val action = InputNameFragmentDirections.actionInputNameFragmentToHomeFragment(username)
+                                    view?.navController?.navigate(action)
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+                            "404" -> {
+                                binding.tvNameError.isVisible = true
+                            }
+                        }
+                    }
+            }
+
+            baseActivity?.subscribe {
+                stompClient.send("/app/add-username", username).compose(applySchedulers()).subscribe {
+                    Toast.makeText(context, "Send add username success!", Toast.LENGTH_LONG).show()
+                }
+            }
         }
     }
 }
