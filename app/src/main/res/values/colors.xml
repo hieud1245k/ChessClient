@@ -16,4 +16,6 @@
     <color name="colorGray">#999A9A</color>
     <color name="colorWhite20">#D3D3D3</color>
     <color name="colorRed">#FF1100</color>
+    <color name="colorAccentBlue">#00FFF7</color>
+    <color name="colorAccentRed">#FF7777</color>
 </resources>

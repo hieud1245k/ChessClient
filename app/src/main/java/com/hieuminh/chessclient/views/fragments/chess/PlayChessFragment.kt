@@ -34,6 +34,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     private lateinit var name: String
     private var createRoom: Boolean = false
     private var yourTurn = false
+    private var currentChessRequest: ChessRequest? = null
 
     override fun getViewBinding() = FragmentPlayChessBinding.inflate(layoutInflater)
 
@@ -53,9 +54,11 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         if (item.canKill || item.canMove) {
             sendChessmanAction(item)
             item.chessMan = currentBoxSelected?.chessMan
+            item.justJump = true
             currentBoxSelected?.run {
                 chessMan = null
                 isClicked = false
+                justJump = true
                 notifyChanged(boxAdapter)
             }
             currentBoxSelected = null
@@ -73,11 +76,17 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     }
 
     private fun sendChessmanAction(item: Box) {
+        currentChessRequest?.resetJump(boxAdapter)
+
         val chessRequest = ChessRequest()
         chessRequest.from = currentBoxSelected?.copy()
         chessRequest.to = item.copy()
         chessRequest.playerName = room.getRivalPlayerName(name)
         chessRequest.roomId = room.id
+        currentChessRequest = ChessRequest().apply {
+            from = currentBoxSelected
+            to = item
+        }
         val request = Gson().toJson(chessRequest)
         baseActivity?.subscribe { stompClient ->
             stompClient.send("/app/go-to-box", request).compose(applySchedulers()).subscribe {
@@ -250,17 +259,28 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                     if (name != chessRequest.playerName) {
                         return@subscribe
                     }
+
+                    currentChessRequest?.resetJump(boxAdapter)
+
                     val fromBox = boxMap[Pair(chessRequest.from?.x ?: 0, chessRequest.from?.y ?: 0)]
                     val toBox = boxMap[Pair(chessRequest.to?.x ?: 0, chessRequest.to?.y ?: 0)]
 
                     toBox?.run {
                         chessMan = fromBox?.chessMan
+                        justJump = true
                         notifyChanged(boxAdapter)
                     }
                     fromBox?.run {
                         chessMan = null
+                        justJump = true
                         notifyChanged(boxAdapter)
                     }
+
+                    currentChessRequest = ChessRequest().apply {
+                        to = toBox
+                        from = fromBox
+                    }
+
                     yourTurn = true
                     binding.tvYourTurn.setText(if (yourTurn) R.string.your_turn else R.string.please_waiting)
                 }, {

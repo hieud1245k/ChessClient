@@ -2,9 +2,9 @@ package com.hieuminh.chessclient.views.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import androidx.core.view.setPadding
 import com.hieuminh.chessclient.R
+import com.hieuminh.chessclient.common.extensions.ContextExtensions.isTablet
 import com.hieuminh.chessclient.databinding.ItemBoxBinding
 import com.hieuminh.chessclient.models.Box
 import com.hieuminh.chessclient.views.adapters.base.BaseAdapter
@@ -22,8 +22,8 @@ class BoxAdapter(private val size: Int) : BaseAdapter<Box>() {
                 data.isClicked -> R.color.colorLightGreen
                 else -> if (data.x.plus(data.y).rem(2) == 1) R.color.white else R.color.colorWeighGreen
             }
-            binding.flContainer.layoutParams = LinearLayout.LayoutParams(size, size)
-            binding.flContainer.setBackgroundResource(bgColorResId)
+            binding.llEntryContainer.layoutParams = ViewGroup.LayoutParams(size, size)
+            binding.llBoxContainer.setBackgroundResource(bgColorResId)
             val chessMan = data.chessMan
             if (chessMan != null) {
                 binding.ivImage.setImageResource(chessMan.imageResId)
@@ -31,8 +31,15 @@ class BoxAdapter(private val size: Int) : BaseAdapter<Box>() {
             } else {
                 binding.ivImage.setImageDrawable(null)
             }
-            binding.ivImage.setPadding(size / 5)
-            binding.tvName.text = data.getPositionString()
+            binding.ivImage.setPadding(size / if (itemView.context.isTablet) 8 else 12)
+
+            if (data.justJump) {
+                binding.llEntryContainer.setBackgroundResource(R.color.colorOrange)
+                binding.llBoxContainer.setBackgroundResource(bgColorResId)
+            } else {
+                binding.llEntryContainer.setBackgroundResource(bgColorResId)
+                binding.llBoxContainer.background = null
+            }
         }
     }
 }

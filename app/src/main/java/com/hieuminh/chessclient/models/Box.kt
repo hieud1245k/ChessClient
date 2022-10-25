@@ -9,6 +9,7 @@ data class Box(
     var canMove: Boolean = false,
     var canKill: Boolean = false,
     var chessMan: ChessMan? = null,
+    var justJump: Boolean = false,
 ) {
     private fun getAdapterPosition(): Int {
         return y * 8 + x

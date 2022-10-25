@@ -1,6 +1,7 @@
 package com.hieuminh.chessclient.models.request
 
 import com.hieuminh.chessclient.models.Box
+import com.hieuminh.chessclient.views.adapters.BoxAdapter
 import java.io.Serializable
 
 class ChessRequest : Serializable {
@@ -10,4 +11,16 @@ class ChessRequest : Serializable {
 
     var playerName: String? = null
     var roomId: Long? = null
+
+    fun resetJump(boxAdapter: BoxAdapter) {
+        from?.run {
+            justJump = false
+            notifyChanged(boxAdapter)
+        }
+
+        to?.run {
+            justJump = false
+            notifyChanged(boxAdapter)
+        }
+    }
 }
