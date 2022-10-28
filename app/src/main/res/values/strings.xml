@@ -27,4 +27,5 @@
     <string name="please_waiting">Please waiting</string>
     <string name="start_game">Start game</string>
     <string name="name_is_exist_please_input_another_name">Name is exist, please input another name</string>
+    <string name="waiting_for_the_next_player">Waiting for the next player</string>
 </resources>

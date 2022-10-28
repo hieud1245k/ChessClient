@@ -21,7 +21,6 @@
         android:layout_marginTop="@dimen/dp_8"
         android:hint="@string/input_ip_address"
         android:importantForAutofill="no"
-        android:inputType="number"
         android:textSize="@dimen/sp_14" />
 
     <TextView

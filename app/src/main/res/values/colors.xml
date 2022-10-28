@@ -18,4 +18,8 @@
     <color name="colorRed">#FF1100</color>
     <color name="colorAccentBlue">#00FFF7</color>
     <color name="colorAccentRed">#FF7777</color>
+    <color name="colorTransparent75">#BF000000</color>
+    <color name="colorTransparent60">#99000000</color>
+    <color name="colorTransparent25">#40000000</color>
+    <color name="colorTransparent40">#66000000</color>
 </resources>
