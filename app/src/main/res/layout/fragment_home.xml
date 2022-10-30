@@ -12,52 +12,9 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/teal_700"
-            android:orientation="horizontal"
-            android:padding="@dimen/dp_16">
-
-            <TextView
-                android:id="@+id/tv_title"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:textColor="@color/white"
-                android:textSize="@dimen/sp_16" />
-
-            <EditText
-                android:id="@+id/et_find_room"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="@dimen/dp_16"
-                android:drawableStart="@drawable/ic_baseline_search_24"
-                android:drawablePadding="@dimen/dp_10"
-                android:drawableTint="@color/colorWhite20"
-                android:gravity="center_vertical"
-                android:hint="@string/find_room"
-                android:importantForAutofill="no"
-                android:inputType="number"
-                android:textColor="@color/white"
-                android:textColorHint="@color/colorWhite20"
-                android:textSize="@dimen/sp_18" />
-
-            <Button
-                android:id="@+id/bt_find_room"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/dp_16"
-                android:text="@string/find" />
-
-            <Button
-                android:id="@+id/bt_play_now"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/play_now" />
-
-        </LinearLayout>
+        <include
+            android:id="@+id/layout_header"
+            layout="@layout/layout_home_header" />
 
         <RelativeLayout
             android:layout_width="match_parent"

@@ -129,6 +129,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                     val firstPlayerName = stompMessage.payload
                     yourTurn = firstPlayerName == name
                     binding.llStartGame.isVisible = false
+                    Toast.makeText(context, if (yourTurn) R.string.your_turn else R.string.please_waiting, Toast.LENGTH_SHORT).show()
                 }, {
                     Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
                 })

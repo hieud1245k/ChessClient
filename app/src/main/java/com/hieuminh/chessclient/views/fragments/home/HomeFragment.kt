@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.hieuminh.chessclient.R
 import com.hieuminh.chessclient.common.extensions.ContextExtensions.isLandscape
 import com.hieuminh.chessclient.common.extensions.ContextExtensions.isTablet
+import com.hieuminh.chessclient.common.extensions.StringExtensions.toLongSafe
+import com.hieuminh.chessclient.common.extensions.ViewExtensions.hideKeyboard
 import com.hieuminh.chessclient.common.extensions.ViewExtensions.navController
 import com.hieuminh.chessclient.databinding.FragmentHomeBinding
 import com.hieuminh.chessclient.models.Room
@@ -35,11 +37,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
     }
 
     override fun onItemClick(item: Room, position: Int) {
-        chessViewModel?.joinRoom(item.id ?: return, name)
+        joinRoom(item.id ?: return, name)
     }
 
     override fun initListener() {
-        binding.btPlayNow.setOnClickListener { }
+        binding.layoutHeader.btPlayNow.setOnClickListener { }
+        binding.layoutHeader.btFindRoom.setOnClickListener {
+            val roomId = binding.layoutHeader.etFindRoom.text.toString().toLongSafe()
+            joinRoom(roomId, name)
+        }
         binding.btCreateNewRoom.setOnClickListener { showConfirmCreateNewRoomDialog() }
         binding.sflRoomLisRefresh.setOnRefreshListener {
             binding.sflRoomLisRefresh.isRefreshing = false
@@ -52,19 +58,31 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
             roomAdapter.updateData(roomList.toMutableList())
         }
 
-        chessViewModel?.joinRoomLiveData?.observe(this) { room ->
-            goToPlayChess(room, false)
-        }
-
         chessViewModel?.newRoomLiveData?.observe(this) { room ->
             goToPlayChess(room, true)
         }
     }
 
+    private fun joinRoom(roomId: Long, name: String) {
+        chessViewModel?.joinRoom(roomId, name, { room ->
+            goToPlayChess(room, false)
+        }, {
+            chessViewModel?.fetchRoomList()
+            binding.layoutHeader.etFindRoom.run {
+                text.clear()
+                hideKeyboard()
+            }
+            AlertDialog.Builder(context)
+                .setTitle(R.string.notice)
+                .setMessage("Join room with id $roomId failed! please try again or create a new room!")
+                .show()
+        })
+    }
+
     override fun initView() {
         observerLiveData()
 
-        binding.tvTitle.text = String.format(resources.getString(R.string.hello_s), name)
+        binding.layoutHeader.tvTitle.text = String.format(resources.getString(R.string.hello_s), name)
 
         roomAdapter = RoomAdapter()
         roomAdapter.registerAdapterDataObserver(roomDataObserver)
@@ -88,7 +106,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
         AlertDialog.Builder(context)
             .setTitle(R.string.notice)
             .setMessage(getString(R.string.are_you_sure_you_want_to_create_new_room))
-            .setIcon(android.R.drawable.ic_dialog_alert)
             .setPositiveButton(R.string.ok) { _, _ -> createNewRoom() }
             .setNegativeButton(R.string.cancel, null)
             .show()

@@ -1,10 +1,11 @@
 package com.hieuminh.chessclient.common.extensions
 
+import android.content.Context
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.Navigation
-import com.hieuminh.chessclient.common.extensions.ViewExtensions.navController
 
 object ViewExtensions {
     val View.navController: NavController?
@@ -20,7 +21,12 @@ object ViewExtensions {
             navController?.navigate(directions)
         } catch (e: Exception) {
             e.printStackTrace()
-            null
         }
+    }
+
+    fun View.hideKeyboard() {
+        clearFocus()
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager ?: return
+        imm.hideSoftInputFromWindow(windowToken, 0)
     }
 }
