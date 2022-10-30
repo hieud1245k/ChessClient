@@ -1,6 +1,7 @@
 package com.hieuminh.chessclient.views.fragments.chess
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
@@ -64,11 +65,11 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
             stompClient.topic("/queue/go-to-box/${room.id}")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    val chessRequest = JsonUtils.fromJson<ChessRequest>(it.payload) ?: return@subscribe
+                .subscribe(sub@{
+                    val chessRequest = JsonUtils.fromJson<ChessRequest>(it.payload) ?: return@sub
                     val name = name
                     if (name != chessRequest.playerName) {
-                        return@subscribe
+                        return@sub
                     }
 
                     currentChessRequest?.resetJump(boxAdapter)
@@ -104,8 +105,17 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                 .subscribe({ stomMessage ->
                     JsonUtils.fromJson<Room>(stomMessage.payload)?.let {
                         binding.llStartGame.isVisible = room.playerFirstName == null || room.playerSecondName == null
+                        if (
+                            (it.playerFirstName == null || it.playerSecondName == null)
+                            && room.playerFirstName != null
+                            && room.playerSecondName != null
+                        ) {
+                            val rivalName = room.getRivalPlayerName(name)
+                            Toast.makeText(context, "$rivalName have left this room", Toast.LENGTH_LONG).show()
+                            resetData()
+                        }
                         room = it
-                        updateRivalName()
+                        updateRivalName(true)
                     }
                 }, {
                     Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
@@ -320,7 +330,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         binding.btStartGame.setOnClickListener {
             baseActivity?.subscribe { stompClient ->
                 stompClient.send("/app/start-game", room.id.toString()).compose(applySchedulers()).subscribe {
-                    Toast.makeText(context, "Send start game message successful!", Toast.LENGTH_LONG).show()
+                    Log.d("START_GAME", "Send start game message successful!")
                 }
             }
         }
@@ -351,8 +361,11 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         updateRivalName()
     }
 
-    private fun updateRivalName() {
+    private fun updateRivalName(rivalJoined: Boolean = false) {
         val rivalName = room.getRivalPlayerName(name)
+        if (rivalName != null && rivalJoined) {
+            Toast.makeText(context, "$rivalName have joined this room", Toast.LENGTH_LONG).show()
+        }
         binding.layoutRivalInfo.tvName.text = rivalName ?: resources.getString(R.string.waiting_for_the_next_player)
         binding.layoutYourInfo.tvStatus.setText(R.string.please_waiting)
         binding.layoutRivalInfo.tvStatus.setText(R.string.please_waiting)
@@ -379,5 +392,10 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
             }
         }
         boxMap = boxList.associateBy { Pair(it.x, it.y) }
+    }
+
+    private fun resetData() {
+        initData()
+        boxAdapter.updateData(boxList)
     }
 }

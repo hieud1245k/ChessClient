@@ -28,4 +28,7 @@
     <string name="start_game">Start game</string>
     <string name="name_is_exist_please_input_another_name">Name is exist, please input another name</string>
     <string name="waiting_for_the_next_player">Waiting for the next player</string>
+    <string name="choose_game_mode">Choose game mode</string>
+    <string name="offline">Offline</string>
+    <string name="online">Online</string>
 </resources>

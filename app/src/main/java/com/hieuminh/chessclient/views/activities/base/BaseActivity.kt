@@ -30,9 +30,6 @@ abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), InitL
         super.onCreate(savedInstanceState)
         binding = getViewBinding()
         setContentView(binding.root)
-
-        chessViewModel = ViewModelProvider(this)[ChessViewModel::class.java]
-
         initView()
         initListener()
     }
@@ -66,6 +63,7 @@ abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), InitL
                     null -> Unit
                     LifecycleEvent.Type.OPENED -> {
                         toast("Stomp connection opened")
+                        chessViewModel = ViewModelProvider(this)[ChessViewModel::class.java]
                         success.invoke(stompClient)
                     }
                     LifecycleEvent.Type.ERROR -> {

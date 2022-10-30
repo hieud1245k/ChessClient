@@ -15,7 +15,6 @@ import com.hieuminh.chessclient.views.adapters.RoomAdapter
 import com.hieuminh.chessclient.views.adapters.base.BaseAdapter
 import com.hieuminh.chessclient.views.fragments.base.BaseFragment
 
-
 class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventListener<Room> {
     private lateinit var name: String
     private lateinit var roomAdapter: RoomAdapter

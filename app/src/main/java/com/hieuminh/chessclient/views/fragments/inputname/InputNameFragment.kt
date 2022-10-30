@@ -1,5 +1,6 @@
 package com.hieuminh.chessclient.views.fragments.inputname
 
+import android.util.Log
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -34,6 +35,11 @@ open class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
         val ipAddress = binding.etIpAddress.text.toString().trim()
         val port = binding.etPort.text.toString().trim()
 
+        UrlConstants.run {
+            ANDROID_EMULATOR_LOCALHOST = ipAddress
+            SERVER_PORT = port
+        }
+
         baseActivity?.connect(ipAddress, port) { stompClient ->
             baseActivity?.subscribe {
                 stompClient.topic("/queue/add-username/${AppUtils.getPath(username)}")
@@ -44,7 +50,7 @@ open class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
                         when (payLoad) {
                             username -> {
                                 try {
-                                    val action = InputNameFragmentDirections.actionInputNameFragmentToHomeFragment(username)
+                                    val action = InputNameFragmentDirections.actionInputNameFragmentToGameModeFragment(username)
                                     view?.navController?.navigate(action)
                                 } catch (e: Exception) {
                                     e.printStackTrace()
@@ -59,7 +65,7 @@ open class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
 
             baseActivity?.subscribe {
                 stompClient.send("/app/add-username", username).compose(applySchedulers()).subscribe {
-                    Toast.makeText(context, "Send add username success!", Toast.LENGTH_LONG).show()
+                    Log.d("ADD_USERNAME", "Send add username success!")
                 }
             }
         }
