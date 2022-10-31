@@ -31,4 +31,5 @@
     <string name="choose_game_mode">Choose game mode</string>
     <string name="offline">Offline</string>
     <string name="online">Online</string>
+    <string name="room_id">Room id</string>
 </resources>

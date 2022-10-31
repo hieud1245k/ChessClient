@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import com.hieuminh.chessclient.R
 import com.hieuminh.chessclient.common.enums.ChessManType
 import com.hieuminh.chessclient.common.enums.PlayerType
+import com.hieuminh.chessclient.common.extensions.ViewExtensions.navController
 import com.hieuminh.chessclient.databinding.FragmentPlayChessBinding
 import com.hieuminh.chessclient.databinding.LayoutPlayerInfoBinding
 import com.hieuminh.chessclient.models.*
@@ -334,6 +335,9 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                     Log.d("START_GAME", "Send start game message successful!")
                 }
             }
+        }
+        binding.ivBack.setOnClickListener {
+            view?.navController?.popBackStack()
         }
     }
 
