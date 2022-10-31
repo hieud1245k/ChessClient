@@ -12,13 +12,13 @@
     <androidx.cardview.widget.CardView
         android:layout_width="@dimen/dp_400"
         android:layout_height="match_parent"
+        android:layout_marginVertical="@dimen/dp_20"
         app:cardCornerRadius="@dimen/dp_4"
         app:cardElevation="@dimen/dp_4">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginVertical="@dimen/dp_40"
             tools:context=".views.fragments.mode.GameModeFragment">
 
             <TextView

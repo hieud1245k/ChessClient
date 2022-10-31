@@ -1,5 +1,6 @@
 package com.hieuminh.chessclient.views.fragments.chess
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -39,11 +40,6 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     private var currentChessRequest: ChessRequest? = null
 
     private var yourTurn = false
-        set(value) {
-            binding.layoutYourInfo.updateProcess(value)
-            binding.layoutRivalInfo.updateProcess(!value)
-            field = value
-        }
 
     override fun getViewBinding() = FragmentPlayChessBinding.inflate(layoutInflater)
 
@@ -77,6 +73,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
 
                     val fromBox = boxMap[Pair(chessRequest.from?.x ?: 0, chessRequest.from?.y ?: 0)]
                     val toBox = boxMap[Pair(chessRequest.to?.x ?: 0, chessRequest.to?.y ?: 0)]
+                    val oldChessMan = toBox?.chessMan
 
                     toBox?.run {
                         chessMan = fromBox?.chessMan
@@ -89,12 +86,18 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                         notifyChanged(boxAdapter)
                     }
 
+                    if (oldChessMan is King) {
+                        showGameResult(false)
+                        return@sub
+                    }
+
                     currentChessRequest = ChessRequest().apply {
                         to = toBox
                         from = fromBox
                     }
 
                     yourTurn = true
+                    updateProcess()
                 }, {
                     Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
                 })
@@ -129,6 +132,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                 .subscribe({ stompMessage ->
                     val firstPlayerName = stompMessage.payload
                     yourTurn = firstPlayerName == name
+                    updateProcess()
                     binding.llStartGame.isVisible = false
                     Toast.makeText(context, if (yourTurn) R.string.your_turn else R.string.please_waiting, Toast.LENGTH_SHORT).show()
                 }, {
@@ -143,6 +147,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         }
         if (item.canKill || item.canMove) {
             sendChessmanAction(item)
+            val oldChessMan = item.chessMan
             item.chessMan = currentBoxSelected?.chessMan
             item.justJump = true
             currentBoxSelected?.run {
@@ -153,6 +158,10 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
             }
             currentBoxSelected = null
             resetActionList()
+            if (oldChessMan is King) {
+                showGameResult(true)
+                return
+            }
             if (item.y == 7 && item.chessMan is Pawn) {
                 promotePawn(item)
             }
@@ -181,6 +190,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         baseActivity?.subscribe { stompClient ->
             stompClient.send("/app/go-to-box", request).compose(applySchedulers()).subscribe {
                 yourTurn = false
+                updateProcess()
             }
         }
     }
@@ -402,5 +412,26 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     private fun resetData() {
         initData()
         boxAdapter.updateData(boxList)
+    }
+
+    private fun showGameResult(win: Boolean) {
+        AlertDialog.Builder(context)
+            .setTitle(if (win) R.string.you_win else R.string.you_lose)
+            .setMessage(if (win) "Congratulation!" else "Press \"Continue\" to start new game!")
+            .setPositiveButton("Continue") { _, _ ->
+                resetData()
+                if (name.equals(room.playerFirstName)) {
+                    binding.llStartGame.isVisible = true
+                }
+            }
+            .setCancelable(false)
+            .show()
+        yourTurn = false
+        updateProcess(true)
+    }
+
+    private fun updateProcess(isReset: Boolean = false) {
+        binding.layoutYourInfo.updateProcess(yourTurn && !isReset)
+        binding.layoutRivalInfo.updateProcess(!yourTurn && !isReset)
     }
 }

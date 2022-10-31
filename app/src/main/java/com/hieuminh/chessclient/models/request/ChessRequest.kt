@@ -10,7 +10,10 @@ class ChessRequest : Serializable {
     var to: Box? = null
 
     var playerName: String? = null
+
     var roomId: Long? = null
+
+    var checkmate: Boolean = false
 
     fun resetJump(boxAdapter: BoxAdapter) {
         from?.run {

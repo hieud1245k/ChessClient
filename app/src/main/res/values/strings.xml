@@ -32,4 +32,6 @@
     <string name="offline">Offline</string>
     <string name="online">Online</string>
     <string name="room_id">Room id</string>
+    <string name="you_win">You win</string>
+    <string name="you_lose">You lose</string>
 </resources>
