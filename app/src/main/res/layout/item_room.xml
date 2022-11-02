@@ -28,14 +28,14 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/player_img_size"
             android:layout_weight="1"
-            android:src="@drawable/ic_baseline_person_24" />
+            app:srcCompat="@drawable/ic_baseline_person_24" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/sp_16"
             android:text="@string/vs"
-            android:textColor="@color/colorOrange"
+            android:textColor="@color/colorRed"
             android:textSize="@dimen/sp_32"
             android:textStyle="bold" />
 
@@ -44,7 +44,7 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/player_img_size"
             android:layout_weight="1"
-            android:src="@drawable/ic_baseline_person_24" />
+            app:srcCompat="@drawable/ic_baseline_person_24" />
 
     </LinearLayout>
 
