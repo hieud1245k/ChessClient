@@ -10,6 +10,7 @@ import com.hieuminh.chessclient.common.extensions.ContextExtensions.isLandscape
 import com.hieuminh.chessclient.common.extensions.ContextExtensions.isTablet
 import com.hieuminh.chessclient.common.extensions.StringExtensions.toLongSafe
 import com.hieuminh.chessclient.common.extensions.ViewExtensions.hideKeyboard
+import com.hieuminh.chessclient.common.extensions.ViewExtensions.navController
 import com.hieuminh.chessclient.common.extensions.ViewExtensions.navigate
 import com.hieuminh.chessclient.databinding.FragmentHomeBinding
 import com.hieuminh.chessclient.models.Room
@@ -52,6 +53,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
         binding.sflRoomLisRefresh.setOnRefreshListener {
             binding.sflRoomLisRefresh.isRefreshing = false
             chessViewModel?.fetchRoomList()
+        }
+        binding.layoutHeader.ivBack.setOnClickListener {
+            view?.navController?.popBackStack()
         }
     }
 

@@ -3,7 +3,17 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/teal_700"
+    android:gravity="center_vertical"
     android:padding="@dimen/dp_16">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_back"
+        android:layout_width="@dimen/dp_40"
+        android:layout_height="@dimen/dp_40"
+        android:padding="@dimen/dp_6"
+        android:layout_marginEnd="@dimen/dp_16"
+        android:src="@drawable/ic_baseline_arrow_back_ios_new_24"
+        android:tint="@color/white" />
 
     <TextView
         android:id="@+id/tv_title"
@@ -22,7 +32,6 @@
         android:drawableStart="@drawable/ic_baseline_search_24"
         android:drawablePadding="@dimen/dp_10"
         android:drawableTint="@color/colorWhite20"
-        android:gravity="center_vertical"
         android:hint="@string/find_room"
         android:importantForAutofill="no"
         android:inputType="number"
