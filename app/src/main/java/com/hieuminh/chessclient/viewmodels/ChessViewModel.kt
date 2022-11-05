@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 
 class ChessViewModel(private val repository: ChessRepository = ChessRepositoryImpl()) : ViewModel() {
     val roomListLiveData = MutableLiveData<List<Room>>()
-    val newRoomLiveData = MutableLiveData<Room>()
 
     fun fetchRoomList() {
         viewModelScope.launch {
@@ -30,14 +29,14 @@ class ChessViewModel(private val repository: ChessRepository = ChessRepositoryIm
         }
     }
 
-    fun createNewRoom(name: String) {
+    fun createNewRoom(name: String, success: (Room) -> Unit) {
         viewModelScope.launch {
             val result = repository.createNewRoom(name)
 
             when {
                 result.isSuccess -> {
                     val room = result.getOrNull() ?: return@launch
-                    newRoomLiveData.postValue(room)
+                    success(room)
                 }
                 else -> {
                     Log.d("ERROR", result.exceptionOrNull()?.message ?: "")
@@ -66,6 +65,22 @@ class ChessViewModel(private val repository: ChessRepository = ChessRepositoryIm
     fun saveName(name: String, success: (BaseResponse) -> Unit, error: (() -> Unit)? = null) {
         viewModelScope.launch {
             val result = repository.saveName(name)
+
+            when {
+                result.isSuccess -> {
+                    val baseResponse = result.getOrNull() ?: return@launch
+                    success(baseResponse)
+                }
+                else -> {
+                    error?.invoke()
+                }
+            }
+        }
+    }
+
+    fun leaveRoom(room: Room, success: (Room) -> Unit, error: (() -> Unit)? = null) {
+        viewModelScope.launch {
+            val result = repository.leaveRoom(room)
 
             when {
                 result.isSuccess -> {

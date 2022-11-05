@@ -50,6 +50,7 @@ open class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
                         when (payLoad) {
                             username -> {
                                 try {
+                                    baseActivity?.resetSubscriptions()
                                     val action = InputNameFragmentDirections.actionInputNameFragmentToGameModeFragment(username)
                                     view?.navController?.navigate(action)
                                 } catch (e: Exception) {

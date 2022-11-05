@@ -23,4 +23,7 @@ interface ChessService {
 
     @PUT("/api/rooms/{id}")
     fun run(@Path("id") id: Long, @Field("name") name: String)
+
+    @PUT("/api/rooms/leave")
+    fun leaveRoomAsync(@Body room: Room): Deferred<Room>
 }

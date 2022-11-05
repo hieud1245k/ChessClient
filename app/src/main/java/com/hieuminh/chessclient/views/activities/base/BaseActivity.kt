@@ -38,7 +38,7 @@ abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), InitL
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
     }
 
-    private fun resetSubscriptions() {
+    fun resetSubscriptions() {
         if (compositeDisposable != null) {
             compositeDisposable?.dispose()
         }

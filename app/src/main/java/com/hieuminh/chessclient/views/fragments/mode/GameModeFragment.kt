@@ -17,7 +17,9 @@ class GameModeFragment : BaseFragment<FragmentGameModeBinding>() {
     }
 
     override fun initListener() {
-        binding.tvOffline.setOnClickListener { }
+        binding.tvOffline.setOnClickListener {
+            view?.navigate(GameModeFragmentDirections.actionGameModeFragmentToOfllineChessFragment())
+        }
         binding.tvOnline.setOnClickListener {
             view?.navigate(GameModeFragmentDirections.actionGameModeFragmentToHomeFragment(name))
         }

@@ -20,6 +20,14 @@ class Room() : Parcelable {
         return playerFirstName
     }
 
+    fun resetPlayerName(name: String) {
+        if (playerFirstName == name) {
+            playerFirstName = null
+        } else {
+            playerSecondName = null
+        }
+    }
+
     constructor(parcel: Parcel) : this()
 
     override fun describeContents() = 0

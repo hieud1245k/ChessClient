@@ -10,5 +10,7 @@ interface ChessRepository {
 
     suspend fun joinRoom(id: Long, name: String): Result<Room>
 
-    suspend fun saveName(name: String) : Result<BaseResponse>
+    suspend fun saveName(name: String): Result<BaseResponse>
+
+    suspend fun leaveRoom(room: Room): Result<Room>
 }

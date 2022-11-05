@@ -1,12 +1,7 @@
 package com.hieuminh.chessclient.views.fragments.chess
 
-import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.gson.Gson
 import com.hieuminh.chessclient.R
 import com.hieuminh.chessclient.common.enums.ChessManType
 import com.hieuminh.chessclient.common.enums.PlayerType
@@ -14,18 +9,14 @@ import com.hieuminh.chessclient.common.extensions.ViewExtensions.navController
 import com.hieuminh.chessclient.databinding.FragmentPlayChessBinding
 import com.hieuminh.chessclient.databinding.LayoutPlayerInfoBinding
 import com.hieuminh.chessclient.models.*
-import com.hieuminh.chessclient.models.request.ChessRequest
-import com.hieuminh.chessclient.utils.JsonUtils
 import com.hieuminh.chessclient.utils.ViewUtils
 import com.hieuminh.chessclient.views.adapters.BoxAdapter
 import com.hieuminh.chessclient.views.adapters.base.BaseAdapter
 import com.hieuminh.chessclient.views.fragments.base.BaseFragment
 import com.hieuminh.chessclient.views.fragments.dialogs.PawnPromotionFragment
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 import kotlin.math.min
 
-class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.ItemEventListener<Box> {
+class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.ItemEventListener<Box> {
     private lateinit var boxAdapter: BoxAdapter
     private lateinit var boxList: MutableList<Box>
     private lateinit var boxMap: Map<Pair<Int, Int>, Box>
@@ -34,119 +25,17 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     private val moveBoxList = mutableListOf<Box>()
     private val killBoxList = mutableListOf<Box>()
 
-    private lateinit var room: Room
-    private lateinit var name: String
-    private var createRoom: Boolean = false
-    private var currentChessRequest: ChessRequest? = null
-
-    private var yourTurn = false
+    private var name: String = ""
 
     override fun getViewBinding() = FragmentPlayChessBinding.inflate(layoutInflater)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        initData()
         super.onCreate(savedInstanceState)
-        val args = PlayChessFragmentArgs.fromBundle(requireArguments())
-        room = args.room
-        name = args.name
-        createRoom = args.createRoom
-    }
-
-    override fun onResume() {
-        super.onResume()
-        subscribe()
-    }
-
-    private fun subscribe() {
-        baseActivity?.subscribe { stompClient ->
-            stompClient.topic("/queue/go-to-box/${room.id}")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(sub@{
-                    val chessRequest = JsonUtils.fromJson<ChessRequest>(it.payload) ?: return@sub
-                    val name = name
-                    if (name != chessRequest.playerName) {
-                        return@sub
-                    }
-
-                    currentChessRequest?.resetJump(boxAdapter)
-
-                    val fromBox = boxMap[Pair(chessRequest.from?.x ?: 0, chessRequest.from?.y ?: 0)]
-                    val toBox = boxMap[Pair(chessRequest.to?.x ?: 0, chessRequest.to?.y ?: 0)]
-                    val oldChessMan = toBox?.chessMan
-
-                    toBox?.run {
-                        chessMan = fromBox?.chessMan
-                        justJump = true
-                        notifyChanged(boxAdapter)
-                    }
-                    fromBox?.run {
-                        chessMan = null
-                        justJump = true
-                        notifyChanged(boxAdapter)
-                    }
-
-                    if (oldChessMan is King) {
-                        showGameResult(false)
-                        return@sub
-                    }
-
-                    currentChessRequest = ChessRequest().apply {
-                        to = toBox
-                        from = fromBox
-                    }
-
-                    yourTurn = true
-                    updateProcess()
-                }, {
-                    Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
-                })
-        }
-        baseActivity?.subscribe { stompClient ->
-            stompClient.topic("/queue/join-room/${room.id}")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ stomMessage ->
-                    JsonUtils.fromJson<Room>(stomMessage.payload)?.let {
-                        binding.llStartGame.isVisible = room.playerFirstName == null || room.playerSecondName == null
-                        if (
-                            (it.playerFirstName == null || it.playerSecondName == null)
-                            && room.playerFirstName != null
-                            && room.playerSecondName != null
-                        ) {
-                            val rivalName = room.getRivalPlayerName(name)
-                            Toast.makeText(context, "$rivalName have left this room", Toast.LENGTH_LONG).show()
-                            resetData()
-                        }
-                        room = it
-                        updateRivalName(true)
-                    }
-                }, {
-                    Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
-                })
-        }
-        baseActivity?.subscribe { stompClient ->
-            stompClient.topic("/queue/start-game/${room.id}")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ stompMessage ->
-                    val firstPlayerName = stompMessage.payload
-                    yourTurn = firstPlayerName == name
-                    updateProcess()
-                    binding.llStartGame.isVisible = false
-                    Toast.makeText(context, if (yourTurn) R.string.your_turn else R.string.please_waiting, Toast.LENGTH_SHORT).show()
-                }, {
-                    Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
-                })
-        }
+        initData()
     }
 
     override fun onItemClick(item: Box, position: Int) {
-        if (!yourTurn) {
-            return
-        }
         if (item.canKill || item.canMove) {
-            sendChessmanAction(item)
             val oldChessMan = item.chessMan
             item.chessMan = currentBoxSelected?.chessMan
             item.justJump = true
@@ -159,7 +48,6 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
             currentBoxSelected = null
             resetActionList()
             if (oldChessMan is King) {
-                showGameResult(true)
                 return
             }
             if (item.y == 7 && item.chessMan is Pawn) {
@@ -172,27 +60,6 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         }
         resetActionList()
         onChessmanClicked(item)
-    }
-
-    private fun sendChessmanAction(item: Box) {
-        currentChessRequest?.resetJump(boxAdapter)
-
-        val chessRequest = ChessRequest()
-        chessRequest.from = currentBoxSelected?.copy()
-        chessRequest.to = item.copy()
-        chessRequest.playerName = room.getRivalPlayerName(name)
-        chessRequest.roomId = room.id
-        currentChessRequest = ChessRequest().apply {
-            from = currentBoxSelected
-            to = item
-        }
-        val request = Gson().toJson(chessRequest)
-        baseActivity?.subscribe { stompClient ->
-            stompClient.send("/app/go-to-box", request).compose(applySchedulers()).subscribe {
-                yourTurn = false
-                updateProcess()
-            }
-        }
     }
 
     private fun onChessmanClicked(item: Box) {
@@ -338,37 +205,13 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         }
     }
 
-    private fun leave() {
-        baseActivity?.resetSubscriptions()
-        val roomRequest = room
-        roomRequest.resetPlayerName(name)
-        chessViewModel?.leaveRoom(roomRequest, {
-            Toast.makeText(context, "You left game!", Toast.LENGTH_LONG).show()
-            view?.navController?.popBackStack()
-        })
-    }
-
     override fun initListener() {
-        binding.btStartGame.setOnClickListener {
-            baseActivity?.subscribe { stompClient ->
-                stompClient.send("/app/start-game", room.id.toString()).compose(applySchedulers()).subscribe {
-                    Log.d("START_GAME", "Send start game message successful!")
-                }
-            }
-        }
         binding.ivBack.setOnClickListener {
-            AlertDialog.Builder(context)
-                .setTitle(R.string.notice)
-                .setMessage(getString(R.string.are_you_sure_you_want_to_leave_this_room))
-                .setPositiveButton(getString(R.string.leave)) { _, _ -> leave() }
-                .setNegativeButton(R.string.cancel, null)
-                .show()
+            view?.navController?.popBackStack()
         }
     }
 
     override fun initView() {
-        binding.ivRoomId.text = room.roomTextId
-
         val size = min(ViewUtils.getScreenWidth(activity), ViewUtils.getScreenHeight(activity)) - 50
         boxAdapter = BoxAdapter(size / 8)
         boxAdapter.updateData(boxList)
@@ -388,17 +231,6 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         }
 
         binding.layoutRivalInfo.ivAvatar.setColorFilter(resources.getColor(R.color.black))
-        updateRivalName()
-    }
-
-    private fun updateRivalName(rivalJoined: Boolean = false) {
-        val rivalName = room.getRivalPlayerName(name)
-        if (rivalName != null && rivalJoined) {
-            Toast.makeText(context, "$rivalName have joined this room", Toast.LENGTH_LONG).show()
-        }
-        binding.layoutRivalInfo.tvName.text = rivalName ?: resources.getString(R.string.waiting_for_the_next_player)
-        binding.layoutYourInfo.tvStatus.setText(R.string.please_waiting)
-        binding.layoutRivalInfo.tvStatus.setText(R.string.please_waiting)
     }
 
     private fun LayoutPlayerInfoBinding.updateProcess(yourTurn: Boolean) {
@@ -422,31 +254,5 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
             }
         }
         boxMap = boxList.associateBy { Pair(it.x, it.y) }
-    }
-
-    private fun resetData() {
-        initData()
-        boxAdapter.updateData(boxList)
-    }
-
-    private fun showGameResult(win: Boolean) {
-        AlertDialog.Builder(context)
-            .setTitle(if (win) R.string.you_win else R.string.you_lose)
-            .setMessage(if (win) "Congratulation!" else "Press \"Continue\" to start new game!")
-            .setPositiveButton("Continue") { _, _ ->
-                resetData()
-                if (name.equals(room.playerFirstName)) {
-                    binding.llStartGame.isVisible = true
-                }
-            }
-            .setCancelable(false)
-            .show()
-        yourTurn = false
-        updateProcess(true)
-    }
-
-    private fun updateProcess(isReset: Boolean = false) {
-        binding.layoutYourInfo.updateProcess(yourTurn && !isReset)
-        binding.layoutRivalInfo.updateProcess(!yourTurn && !isReset)
     }
 }

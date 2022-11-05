@@ -10,7 +10,7 @@ import com.hieuminh.chessclient.common.extensions.ContextExtensions.isLandscape
 import com.hieuminh.chessclient.common.extensions.ContextExtensions.isTablet
 import com.hieuminh.chessclient.common.extensions.StringExtensions.toLongSafe
 import com.hieuminh.chessclient.common.extensions.ViewExtensions.hideKeyboard
-import com.hieuminh.chessclient.common.extensions.ViewExtensions.navController
+import com.hieuminh.chessclient.common.extensions.ViewExtensions.navigate
 import com.hieuminh.chessclient.databinding.FragmentHomeBinding
 import com.hieuminh.chessclient.models.Room
 import com.hieuminh.chessclient.views.adapters.RoomAdapter
@@ -41,7 +41,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
     }
 
     override fun initListener() {
-        binding.layoutHeader.btPlayNow.setOnClickListener { }
+        binding.layoutHeader.btPlayNow.setOnClickListener {
+            // TODO
+        }
         binding.layoutHeader.btFindRoom.setOnClickListener {
             val roomId = binding.layoutHeader.etFindRoom.text.toString().toLongSafe()
             joinRoom(roomId, name)
@@ -56,10 +58,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
     private fun observerLiveData() {
         chessViewModel?.roomListLiveData?.observe(this) { roomList ->
             roomAdapter.updateData(roomList.toMutableList())
-        }
-
-        chessViewModel?.newRoomLiveData?.observe(this) { room ->
-            goToPlayChess(room, true)
         }
     }
 
@@ -99,7 +97,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
     }
 
     private fun createNewRoom() {
-        chessViewModel?.createNewRoom(name)
+        chessViewModel?.createNewRoom(name) { room ->
+            goToPlayChess(room, true)
+        }
     }
 
     private fun showConfirmCreateNewRoomDialog() {
@@ -112,8 +112,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
     }
 
     private fun goToPlayChess(room: Room, createRoom: Boolean) {
-        val action = HomeFragmentDirections.actionHomeFragmentToPlayChessFragment(room, name, createRoom)
-        view?.navController?.navigate(action)
+        view?.navigate(HomeFragmentDirections.actionHomeFragmentToPlayChessFragment(room, name, createRoom))
     }
 
     private val roomDataObserver = object : RecyclerView.AdapterDataObserver() {
