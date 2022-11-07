@@ -36,4 +36,5 @@
     <string name="you_lose">You lose</string>
     <string name="are_you_sure_you_want_to_leave_this_room">Are you sure you want to leave this room!</string>
     <string name="leave">Leave</string>
+    <string name="robot">Robot</string>
 </resources>

@@ -47,4 +47,12 @@ class ChessRepositoryImpl(private val service: ChessService = ApiClientProvider.
             Result.failure(throwable)
         }
     }
+
+    override suspend fun startOfflineGame(name: String): Result<Room> {
+        return try {
+            Result.success(service.startOfflineGameAsync(name).await())
+        } catch (throwable: Throwable) {
+            Result.failure(throwable)
+        }
+    }
 }

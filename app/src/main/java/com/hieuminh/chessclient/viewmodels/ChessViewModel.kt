@@ -93,4 +93,20 @@ class ChessViewModel(private val repository: ChessRepository = ChessRepositoryIm
             }
         }
     }
+
+    fun startOfflineGame(name: String, success: (Room) -> Unit) {
+        viewModelScope.launch {
+            val result = repository.startOfflineGame(name)
+
+            when {
+                result.isSuccess -> {
+                    val room = result.getOrNull() ?: return@launch
+                    success(room)
+                }
+                else -> {
+                    Log.d("ERROR", result.exceptionOrNull()?.message ?: "")
+                }
+            }
+        }
+    }
 }

@@ -26,4 +26,8 @@ interface ChessService {
 
     @PUT("/api/rooms/leave")
     fun leaveRoomAsync(@Body room: Room): Deferred<Room>
+
+    @POST("/api/rooms/start-offline-game")
+    @FormUrlEncoded
+    fun startOfflineGameAsync(@Field("name") name: String): Deferred<Room>
 }

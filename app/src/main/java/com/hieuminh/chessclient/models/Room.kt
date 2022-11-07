@@ -10,6 +10,10 @@ class Room() : Parcelable {
 
     var playerSecondName: String? = null
 
+    var firstPlay: String? = null
+
+    var isOnline: Boolean = true
+
     val roomTextId: String
         get() = "Room id: $id"
 
