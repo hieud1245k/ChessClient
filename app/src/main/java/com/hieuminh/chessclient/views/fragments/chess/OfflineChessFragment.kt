@@ -2,7 +2,6 @@ package com.hieuminh.chessclient.views.fragments.chess
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.gson.Gson
@@ -250,7 +249,7 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
         val roomRequest = room
         roomRequest.resetPlayerName(name)
         chessViewModel?.leaveRoom(roomRequest, {
-            Toast.makeText(context, "You left game!", Toast.LENGTH_SHORT).show()
+           toast("You left game!")
             view?.navController?.popBackStack()
         })
     }
@@ -301,11 +300,11 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
                             yourTurn = true
                             updateProcess()
                         }, {
-                            Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_SHORT).show()
+                           toast("Connect to /queue/go-to-box Failure!")
                         })
                 }
                 yourTurn = room.firstPlay == name
-                Toast.makeText(context, if (yourTurn) R.string.your_turn else R.string.please_waiting, Toast.LENGTH_SHORT).show()
+               toast(if (yourTurn) R.string.your_turn else R.string.please_waiting)
                 updateProcess()
                 binding.llStartGame.isVisible = false
             }

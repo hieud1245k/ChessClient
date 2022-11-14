@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import com.hieuminh.chessclient.interfaces.InitLayout
 import com.hieuminh.chessclient.viewmodels.ChessViewModel
-import com.hieuminh.chessclient.views.activities.base.BaseActivity
+import com.hieuminh.chessclient.views.activities.ChessActivity
 import io.reactivex.Completable
 import io.reactivex.CompletableTransformer
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -19,15 +19,14 @@ import ua.naiksoftware.stomp.StompClient
 abstract class BaseFragment<VBinding : ViewBinding> : Fragment(), InitLayout<VBinding> {
     private lateinit var subscribeList: MutableList<Disposable>
 
-    protected val baseActivity: BaseActivity<*>?
-        get() = activity as? BaseActivity<*>
+    protected val chessActivity: ChessActivity?
+        get() = activity as? ChessActivity
 
     protected lateinit var binding: VBinding
         private set
 
-
     protected val chessViewModel: ChessViewModel?
-        get() = baseActivity?.chessViewModel
+        get() = chessActivity?.chessViewModel
 
     protected fun applySchedulers(): CompletableTransformer {
         return CompletableTransformer { upstream: Completable ->
@@ -39,7 +38,7 @@ abstract class BaseFragment<VBinding : ViewBinding> : Fragment(), InitLayout<VBi
     }
 
     protected fun subscribe(predicate: (StompClient) -> Disposable) {
-        val disposable = baseActivity?.subscribe(predicate) ?: return
+        val disposable = chessActivity?.subscribe(predicate) ?: return
         subscribeList.add(disposable)
     }
 
@@ -56,8 +55,16 @@ abstract class BaseFragment<VBinding : ViewBinding> : Fragment(), InitLayout<VBi
     }
 
     override fun onDestroyView() {
-        baseActivity?.clearListener(subscribeList)
+        chessActivity?.clearListener(subscribeList)
         subscribeList.clear()
         super.onDestroyView()
+    }
+
+    protected fun toast(text: String) {
+        chessActivity?.toast(text)
+    }
+
+    protected fun toast(id: Int) {
+        toast(resources.getString(id))
     }
 }

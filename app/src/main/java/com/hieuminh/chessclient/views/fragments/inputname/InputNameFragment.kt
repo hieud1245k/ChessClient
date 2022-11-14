@@ -1,7 +1,6 @@
 package com.hieuminh.chessclient.views.fragments.inputname
 
 import android.util.Log
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import com.hieuminh.chessclient.common.constants.UrlConstants
@@ -40,7 +39,7 @@ open class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
             SERVER_PORT = port
         }
 
-        baseActivity?.connect(ipAddress, port) { stompClient ->
+        chessActivity?.connect(ipAddress, port) { stompClient ->
             subscribe {
                 stompClient.topic("/queue/add-username/${AppUtils.getPath(username)}")
                     .subscribeOn(Schedulers.io())

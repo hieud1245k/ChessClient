@@ -3,7 +3,6 @@ package com.hieuminh.chessclient.views.fragments.chess
 import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.gson.Gson
@@ -99,7 +98,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                     yourTurn = true
                     updateProcess()
                 }, {
-                    Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
+                   toast( "Connect to /queue/go-to-box Failure!")
                 })
         }
         subscribe { stompClient ->
@@ -115,14 +114,14 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                             && room.playerSecondName != null
                         ) {
                             val rivalName = room.getRivalPlayerName(name)
-                            Toast.makeText(context, "$rivalName have left this room", Toast.LENGTH_LONG).show()
+                           toast( "$rivalName have left this room")
                             resetData()
                         }
                         room = it
                         updateRivalName(true)
                     }
                 }, {
-                    Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
+                   toast( "Connect to /queue/go-to-box Failure!")
                 })
         }
         subscribe { stompClient ->
@@ -134,9 +133,9 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                     yourTurn = firstPlayerName == name
                     updateProcess()
                     binding.llStartGame.isVisible = false
-                    Toast.makeText(context, if (yourTurn) R.string.your_turn else R.string.please_waiting, Toast.LENGTH_SHORT).show()
+                   toast( if (yourTurn) R.string.your_turn else R.string.please_waiting)
                 }, {
-                    Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
+                   toast( "Connect to /queue/go-to-box Failure!")
                 })
         }
     }
@@ -342,7 +341,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         val roomRequest = room
         roomRequest.resetPlayerName(name)
         chessViewModel?.leaveRoom(roomRequest, {
-            Toast.makeText(context, "You left game!", Toast.LENGTH_LONG).show()
+           toast( "You left game!")
             view?.navController?.popBackStack()
         })
     }
@@ -393,7 +392,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     private fun updateRivalName(rivalJoined: Boolean = false) {
         val rivalName = room.getRivalPlayerName(name)
         if (rivalName != null && rivalJoined) {
-            Toast.makeText(context, "$rivalName have joined this room", Toast.LENGTH_LONG).show()
+           toast( "$rivalName have joined this room")
         }
         binding.layoutRivalInfo.tvName.text = rivalName ?: resources.getString(R.string.waiting_for_the_next_player)
         binding.layoutYourInfo.tvStatus.setText(R.string.please_waiting)
