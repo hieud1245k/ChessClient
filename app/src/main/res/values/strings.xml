@@ -37,4 +37,6 @@
     <string name="are_you_sure_you_want_to_leave_this_room">Are you sure you want to leave this room!</string>
     <string name="leave">Leave</string>
     <string name="robot">Robot</string>
+    <string name="player_vs_robot">Player vs Robot</string>
+    <string name="player_vs_player">Player vs Player</string>
 </resources>
