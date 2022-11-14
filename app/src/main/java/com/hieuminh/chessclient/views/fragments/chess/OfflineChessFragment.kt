@@ -91,7 +91,7 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
             to = item
         }
         val request = Gson().toJson(chessRequest)
-        baseActivity?.subscribe { stompClient ->
+        subscribe { stompClient ->
             stompClient.send("/app/offline/go-to-box", request).compose(applySchedulers()).subscribe {
                 yourTurn = false
                 updateProcess()
@@ -247,7 +247,6 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
             view?.navController?.popBackStack()
             return
         }
-        baseActivity?.resetSubscriptions()
         val roomRequest = room
         roomRequest.resetPlayerName(name)
         chessViewModel?.leaveRoom(roomRequest, {
@@ -271,7 +270,7 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
         binding.btStartGame.setOnClickListener {
             chessViewModel?.startOfflineGame(name) {
                 this.room = it
-                baseActivity?.subscribe { stompClient ->
+                subscribe { stompClient ->
                     stompClient.topic("/queue/offline/go-to-box/${room.id}")
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())

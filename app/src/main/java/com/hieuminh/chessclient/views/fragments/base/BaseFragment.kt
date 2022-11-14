@@ -12,14 +12,19 @@ import com.hieuminh.chessclient.views.activities.base.BaseActivity
 import io.reactivex.Completable
 import io.reactivex.CompletableTransformer
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import ua.naiksoftware.stomp.StompClient
 
 abstract class BaseFragment<VBinding : ViewBinding> : Fragment(), InitLayout<VBinding> {
-    protected lateinit var binding: VBinding
-        private set
+    private lateinit var subscribeList: MutableList<Disposable>
 
     protected val baseActivity: BaseActivity<*>?
         get() = activity as? BaseActivity<*>
+
+    protected lateinit var binding: VBinding
+        private set
+
 
     protected val chessViewModel: ChessViewModel?
         get() = baseActivity?.chessViewModel
@@ -33,6 +38,11 @@ abstract class BaseFragment<VBinding : ViewBinding> : Fragment(), InitLayout<VBi
         }
     }
 
+    protected fun subscribe(predicate: (StompClient) -> Disposable) {
+        val disposable = baseActivity?.subscribe(predicate) ?: return
+        subscribeList.add(disposable)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = getViewBinding()
         return binding.root
@@ -40,7 +50,14 @@ abstract class BaseFragment<VBinding : ViewBinding> : Fragment(), InitLayout<VBi
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        subscribeList = mutableListOf()
         initListener()
         initView()
+    }
+
+    override fun onDestroyView() {
+        baseActivity?.clearListener(subscribeList)
+        subscribeList.clear()
+        super.onDestroyView()
     }
 }

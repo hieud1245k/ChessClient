@@ -58,7 +58,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     }
 
     private fun subscribe() {
-        baseActivity?.subscribe { stompClient ->
+        subscribe { stompClient ->
             stompClient.topic("/queue/go-to-box/${room.id}")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -102,7 +102,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                     Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
                 })
         }
-        baseActivity?.subscribe { stompClient ->
+        subscribe { stompClient ->
             stompClient.topic("/queue/join-room/${room.id}")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -125,7 +125,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                     Toast.makeText(context, "Connect to /queue/go-to-box Failure!", Toast.LENGTH_LONG).show()
                 })
         }
-        baseActivity?.subscribe { stompClient ->
+        subscribe { stompClient ->
             stompClient.topic("/queue/start-game/${room.id}")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -187,7 +187,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
             to = item
         }
         val request = Gson().toJson(chessRequest)
-        baseActivity?.subscribe { stompClient ->
+        subscribe { stompClient ->
             stompClient.send("/app/go-to-box", request).compose(applySchedulers()).subscribe {
                 yourTurn = false
                 updateProcess()
@@ -339,7 +339,6 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     }
 
     private fun leave() {
-        baseActivity?.resetSubscriptions()
         val roomRequest = room
         roomRequest.resetPlayerName(name)
         chessViewModel?.leaveRoom(roomRequest, {
@@ -350,7 +349,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
 
     override fun initListener() {
         binding.btStartGame.setOnClickListener {
-            baseActivity?.subscribe { stompClient ->
+            subscribe { stompClient ->
                 stompClient.send("/app/start-game", room.id.toString()).compose(applySchedulers()).subscribe {
                     Log.d("START_GAME", "Send start game message successful!")
                 }

@@ -45,6 +45,12 @@ abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), InitL
         compositeDisposable = CompositeDisposable()
     }
 
+    fun clearListener(disposables: List<Disposable>) {
+        disposables.forEach {
+            compositeDisposable?.remove(it)
+        }
+    }
+
     fun connect(ipAddress: String, port: String, success: (StompClient) -> Unit) {
         if (stompClient?.isConnected == true) {
             success(stompClient!!)
@@ -71,6 +77,8 @@ abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), InitL
                     }
                     LifecycleEvent.Type.CLOSED -> {
                         toast("Stomp connection closed")
+                        resetSubscriptions()
+                        backToDestination()
                     }
                     LifecycleEvent.Type.FAILED_SERVER_HEARTBEAT -> {
                         toast("Stomp failed server heartbeat")
@@ -86,7 +94,11 @@ abstract class BaseActivity<VBinding : ViewBinding> : AppCompatActivity(), InitL
         compositeDisposable?.add(disposable)
     }
 
-    fun subscribe(predicate: (StompClient) -> Disposable) {
-        compositeDisposable?.add(predicate.invoke(stompClient ?: return))
+    fun subscribe(predicate: (StompClient) -> Disposable): Disposable? {
+        val disposable = stompClient?.let { predicate.invoke(it) } ?: return null
+        compositeDisposable?.add(disposable)
+        return disposable
     }
+
+    open fun backToDestination() = Unit
 }

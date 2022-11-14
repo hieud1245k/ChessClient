@@ -41,7 +41,7 @@ open class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
         }
 
         baseActivity?.connect(ipAddress, port) { stompClient ->
-            baseActivity?.subscribe {
+            subscribe {
                 stompClient.topic("/queue/add-username/${AppUtils.getPath(username)}")
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -50,7 +50,6 @@ open class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
                         when (payLoad) {
                             username -> {
                                 try {
-                                    baseActivity?.resetSubscriptions()
                                     val action = InputNameFragmentDirections.actionInputNameFragmentToGameModeFragment(username)
                                     view?.navController?.navigate(action)
                                 } catch (e: Exception) {
@@ -64,7 +63,7 @@ open class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
                     }
             }
 
-            baseActivity?.subscribe {
+            subscribe {
                 stompClient.send("/app/add-username", username).compose(applySchedulers()).subscribe {
                     Log.d("ADD_USERNAME", "Send add username success!")
                 }
