@@ -12,7 +12,11 @@
         tools:layout="@layout/fragment_input_name">
         <action
             android:id="@+id/action_inputNameFragment_to_gameModeFragment"
-            app:destination="@id/gameModeFragment" />
+            app:destination="@id/gameModeFragment"
+            app:enterAnim="@anim/slide_left"
+            app:exitAnim="@anim/wait_anim"
+            app:popEnterAnim="@anim/wait_anim"
+            app:popExitAnim="@anim/slide_right" />
     </fragment>
     <fragment
         android:id="@+id/homeFragment"
@@ -21,7 +25,11 @@
         tools:layout="@layout/fragment_home">
         <action
             android:id="@+id/action_homeFragment_to_playChessFragment"
-            app:destination="@id/playChessFragment" />
+            app:destination="@id/playChessFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
         <argument
             android:name="name"
             app:argType="string" />
@@ -48,13 +56,21 @@
         tools:layout="@layout/fragment_game_mode">
         <action
             android:id="@+id/action_gameModeFragment_to_homeFragment"
-            app:destination="@id/homeFragment" />
+            app:destination="@id/homeFragment"
+            app:enterAnim="@anim/slide_left"
+            app:exitAnim="@anim/wait_anim"
+            app:popEnterAnim="@anim/wait_anim"
+            app:popExitAnim="@anim/slide_right" />
         <argument
             android:name="name"
             app:argType="string" />
         <action
             android:id="@+id/action_gameModeFragment_to_ofllineChessFragment"
-            app:destination="@id/ofllineChessFragment" />
+            app:destination="@id/ofllineChessFragment"
+            app:enterAnim="@android:anim/fade_in"
+            app:exitAnim="@android:anim/fade_out"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
     </fragment>
     <fragment
         android:id="@+id/ofllineChessFragment"
