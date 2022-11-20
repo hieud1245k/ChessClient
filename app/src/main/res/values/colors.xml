@@ -22,4 +22,7 @@
     <color name="colorTransparent60">#99000000</color>
     <color name="colorTransparent25">#40000000</color>
     <color name="colorTransparent40">#66000000</color>
+    <color name="colorBackground">#E6E6E6</color>
+
+    <color name="colorOriginBlack">#FF000000</color>
 </resources>

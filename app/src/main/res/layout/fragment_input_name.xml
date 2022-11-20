@@ -1,78 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:paddingHorizontal="@dimen/dp_24"
+    android:background="@color/colorBackground"
     tools:context=".views.fragments.inputname.InputNameFragment">
 
-    <TextView
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/ip_address"
-        android:textSize="@dimen/sp_16" />
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/dp_16"
+        app:cardCornerRadius="@dimen/dp_4"
+        app:cardElevation="@dimen/dp_4">
 
-    <EditText
-        android:id="@+id/et_ip_address"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_8"
-        android:hint="@string/input_ip_address"
-        android:importantForAutofill="no"
-        android:textSize="@dimen/sp_14" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/dp_24"
+            android:background="@color/white"
+            android:gravity="center"
+            android:orientation="vertical">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_10"
-        android:text="@string/input_name"
-        android:textSize="@dimen/sp_16" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ip_address"
+                android:textSize="@dimen/sp_16" />
 
-    <EditText
-        android:id="@+id/et_port"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_8"
-        android:hint="@string/input_port"
-        android:importantForAutofill="no"
-        android:inputType="number"
-        android:textSize="@dimen/sp_14" />
+            <EditText
+                android:id="@+id/et_ip_address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_8"
+                android:hint="@string/input_ip_address"
+                android:importantForAutofill="no"
+                android:textSize="@dimen/sp_14" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_10"
-        android:text="@string/input_name"
-        android:textSize="@dimen/sp_16" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_10"
+                android:text="@string/input_name"
+                android:textSize="@dimen/sp_16" />
 
-    <EditText
-        android:id="@+id/et_input_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_8"
-        android:hint="@string/input_your_name"
-        android:importantForAutofill="no"
-        android:inputType="text"
-        android:text="Thu Xuan"
-        android:textSize="@dimen/sp_14" />
+            <EditText
+                android:id="@+id/et_port"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_8"
+                android:hint="@string/input_port"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:textSize="@dimen/sp_14" />
 
-    <TextView
-        android:id="@+id/tv_name_error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_marginTop="@dimen/dp_4"
-        android:text="@string/name_is_exist_please_input_another_name"
-        android:textColor="@color/colorRed"
-        android:visibility="gone" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_10"
+                android:text="@string/input_name"
+                android:textSize="@dimen/sp_16" />
 
-    <Button
-        android:id="@+id/bt_submit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_16"
-        android:text="@string/submit" />
+            <EditText
+                android:id="@+id/et_input_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_8"
+                android:hint="@string/input_your_name"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                android:text="@string/thu_xuan"
+                android:textSize="@dimen/sp_14" />
+
+            <TextView
+                android:id="@+id/tv_name_error"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="@dimen/dp_4"
+                android:text="@string/name_is_exist_please_input_another_name"
+                android:textColor="@color/colorRed"
+                android:visibility="gone" />
+
+            <Button
+                android:id="@+id/bt_submit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dp_16"
+                android:text="@string/submit" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>
