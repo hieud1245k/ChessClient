@@ -43,7 +43,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
 
     override fun initListener() {
         binding.layoutHeader.btPlayNow.setOnClickListener {
-            // TODO
+            playNow()
         }
         binding.layoutHeader.btFindRoom.setOnClickListener {
             val roomId = binding.layoutHeader.etFindRoom.text.toString().toLongSafe()
@@ -57,6 +57,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
         binding.layoutHeader.ivBack.setOnClickListener {
             view?.navController?.popBackStack()
         }
+    }
+
+    private fun playNow() {
+        chessViewModel?.playNow(name, { room ->
+            goToPlayChess(room, false)
+        }, {
+            AlertDialog.Builder(context)
+                .setTitle(R.string.notice)
+                .setMessage("No matching room found!")
+                .show()
+        })
     }
 
     private fun observerLiveData() {

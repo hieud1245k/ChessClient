@@ -30,4 +30,8 @@ interface ChessService {
     @POST("/api/rooms/start-offline-game")
     @FormUrlEncoded
     fun startOfflineGameAsync(@Field("name") name: String): Deferred<Room>
+
+    @PUT("/api/rooms/play-now")
+    @FormUrlEncoded
+    fun playNowAsync(@Field("name") name: String): Deferred<Room>
 }

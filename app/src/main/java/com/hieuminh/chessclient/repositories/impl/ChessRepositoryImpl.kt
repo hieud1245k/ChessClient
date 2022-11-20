@@ -55,4 +55,12 @@ class ChessRepositoryImpl(private val service: ChessService = ApiClientProvider.
             Result.failure(throwable)
         }
     }
+
+    override suspend fun playNow(name: String): Result<Room> {
+        return try {
+            Result.success(service.playNowAsync(name).await())
+        } catch (throwable: Throwable) {
+            Result.failure(throwable)
+        }
+    }
 }

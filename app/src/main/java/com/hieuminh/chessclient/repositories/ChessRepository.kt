@@ -15,4 +15,6 @@ interface ChessRepository {
     suspend fun leaveRoom(room: Room): Result<Room>
 
     suspend fun startOfflineGame(name: String): Result<Room>
+
+    suspend fun playNow(name: String): Result<Room>
 }

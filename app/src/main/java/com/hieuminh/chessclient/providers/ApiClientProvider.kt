@@ -33,7 +33,7 @@ object ApiClientProvider {
         return appRetrofit!!
     }
 
-    inline fun <reified T> getService(): T {
+    inline fun <reified T : Any> getService(): T {
         return getRetrofit().create(T::class.java)
     }
 }

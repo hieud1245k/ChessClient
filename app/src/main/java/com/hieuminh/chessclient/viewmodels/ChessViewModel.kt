@@ -109,4 +109,21 @@ class ChessViewModel(private val repository: ChessRepository = ChessRepositoryIm
             }
         }
     }
+
+    fun playNow(name: String, success: (Room) -> Unit, error: (() -> Unit)? = null) {
+        viewModelScope.launch {
+            val result = repository.playNow(name)
+
+            when {
+                result.isSuccess -> {
+                    val room = result.getOrNull() ?: return@launch
+                    success(room)
+                }
+                else -> {
+                    Log.d("ERROR", result.exceptionOrNull()?.message ?: "")
+                    error?.invoke()
+                }
+            }
+        }
+    }
 }
