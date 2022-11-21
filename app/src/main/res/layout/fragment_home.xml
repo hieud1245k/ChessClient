@@ -30,7 +30,9 @@
                     android:id="@+id/rl_room_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginHorizontal="@dimen/dp_16" />
+                    android:layout_marginHorizontal="@dimen/dp_16"
+                    tools:itemCount="20"
+                    tools:listitem="@layout/item_room" />
 
             </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
@@ -40,7 +42,8 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:gravity="center_horizontal"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="@dimen/dp_80"
