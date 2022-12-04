@@ -83,7 +83,8 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
         val chessRequest = ChessRequest()
         chessRequest.from = currentBoxSelected?.copy()
         chessRequest.to = item.copy()
-        chessRequest.playerName = room.getRivalPlayerName(name)
+        chessRequest.playerName = name
+        chessRequest.rivalPlayerName = room.getRivalPlayerName(name)
         chessRequest.roomId = room.id
         currentChessRequest = ChessRequest().apply {
             from = currentBoxSelected
@@ -242,14 +243,14 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
     }
 
     private fun leave() {
-        if (binding.llStartGame.isVisible) {
+        if (binding.layoutStartGame.isVisible) {
             view?.navController?.popBackStack()
             return
         }
         val roomRequest = room
         roomRequest.resetPlayerName(name)
         chessViewModel?.leaveRoom(roomRequest, {
-           toast("You left game!")
+            toast("You left game!")
             view?.navController?.popBackStack()
         })
     }
@@ -266,7 +267,7 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
                 .setNegativeButton(R.string.cancel, null)
                 .show()
         }
-        binding.btStartGame.setOnClickListener {
+        binding.layoutStartGame.btStartGame.setOnClickListener {
             chessViewModel?.startOfflineGame(name) {
                 this.room = it
                 subscribe { stompClient ->
@@ -300,13 +301,13 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
                             yourTurn = true
                             updateProcess()
                         }, {
-                           toast("Connect to /queue/go-to-box Failure!")
+                            toast("Connect to /queue/go-to-box Failure!")
                         })
                 }
                 yourTurn = room.firstPlay == name
-               toast(if (yourTurn) R.string.your_turn else R.string.please_waiting)
+                toast(if (yourTurn) R.string.your_turn else R.string.please_waiting)
                 updateProcess()
-                binding.llStartGame.isVisible = false
+                binding.layoutStartGame.isVisible = false
             }
         }
     }
@@ -331,7 +332,9 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
         }
 
         binding.layoutRivalInfo.ivAvatar.setColorFilter(resources.getColor(R.color.black))
-        binding.llStartGame.isVisible = true
+        binding.layoutStartGame.isVisible = true
+        binding.layoutStartGame.swSuggestions.isVisible = false
+        binding.llSuggestions.isVisible = false
         binding.layoutRivalInfo.tvName.setText(R.string.robot)
     }
 

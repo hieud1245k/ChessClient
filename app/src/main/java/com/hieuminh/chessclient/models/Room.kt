@@ -10,9 +10,15 @@ class Room() : Parcelable {
 
     var playerSecondName: String? = null
 
+    var isPlayerFirstMoveSuggestionsOn: Boolean = false
+
+    var isPlayerSecondMoveSuggestionsOn: Boolean = false
+
     var firstPlay: String? = null
 
     var isOnline: Boolean = true
+
+    var isSuggestionsOn: Boolean = false
 
     val roomTextId: String
         get() = "Room id: $id"

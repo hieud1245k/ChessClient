@@ -40,4 +40,6 @@
     <string name="player_vs_robot">Player vs Robot</string>
     <string name="player_vs_player">Player vs Player</string>
     <string name="thu_xuan">Thu Xuan</string>
+    <string name="turn_on_suggestions">Turn on suggestions</string>
+    <string name="level">Level:</string>
 </resources>

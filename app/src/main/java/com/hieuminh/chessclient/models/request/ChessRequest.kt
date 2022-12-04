@@ -11,7 +11,13 @@ class ChessRequest : Serializable {
 
     var playerName: String? = null
 
+    var rivalPlayerName: String? = null
+
     var roomId: Long? = null
+
+    var isMoveSuggestionsOn: Boolean = false
+
+    var level: Int? = null
 
     var checkmate: Boolean = false
 

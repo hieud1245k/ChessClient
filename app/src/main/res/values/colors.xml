@@ -25,4 +25,5 @@
     <color name="colorBackground">#E6E6E6</color>
 
     <color name="colorOriginBlack">#FF000000</color>
+    <color name="orange">#FF9800</color>
 </resources>

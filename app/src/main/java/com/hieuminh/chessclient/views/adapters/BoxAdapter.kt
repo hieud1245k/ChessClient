@@ -17,6 +17,7 @@ class BoxAdapter(private val size: Int) : BaseAdapter<Box>() {
     inner class BoxViewHolder(private val binding: ItemBoxBinding) : BaseViewHolder(binding.root) {
         override fun bind(data: Box) {
             val bgColorResId = when {
+                data.suggestText != null -> R.drawable.bg_suggest
                 data.canKill -> R.drawable.bg_can_kill
                 data.canMove -> R.drawable.bg_can_move
                 data.isClicked -> R.color.colorLightGreen
@@ -40,6 +41,7 @@ class BoxAdapter(private val size: Int) : BaseAdapter<Box>() {
                 binding.llEntryContainer.setBackgroundResource(bgColorResId)
                 binding.llBoxContainer.background = null
             }
+            binding.tvSuggest.text = data.suggestText
         }
     }
 }
