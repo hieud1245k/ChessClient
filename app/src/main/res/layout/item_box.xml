@@ -17,7 +17,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/dp_4"
-            android:textColor="@color/orange"
+            android:elevation="@dimen/dp_1"
+            android:textColor="#FF1100"
             android:textSize="@dimen/sp_12" />
 
         <androidx.appcompat.widget.AppCompatImageView

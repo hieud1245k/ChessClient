@@ -146,15 +146,18 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
             stompClient.topic("/queue/get-move-suggestions/${name.replace(" ", "-")}")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ stompMessage ->
+                .subscribe(sub@{ stompMessage ->
+                    if (!yourTurn) {
+                        return@sub
+                    }
                     JsonUtils.fromJson<SuggestRequest>(stompMessage.payload)?.let { suggestRequest ->
                         suggestRequest.suggestions.forEachIndexed { index, chessRequest ->
                             val fromBox = boxMap[Pair(chessRequest.from?.x ?: 0, chessRequest.from?.y ?: 0)]
                             val toBox = boxMap[Pair(chessRequest.to?.x ?: 0, chessRequest.to?.y ?: 0)]
 
                             val suggestText = "S${index + 1}"
-                            fromBox?.suggestText = suggestText
-                            toBox?.suggestText = suggestText
+                            fromBox?.suggestText = "${fromBox?.suggestText ?: ""} $suggestText".trim()
+                            toBox?.suggestText = "${toBox?.suggestText ?: ""} $suggestText".trim()
 
                             fromBox?.notifyChanged(boxAdapter)
                             toBox?.notifyChanged(boxAdapter)
