@@ -16,10 +16,10 @@ class RoomAdapter : BaseAdapter<Room>() {
         override fun bind(data: Room) {
             binding.tvRoomId.text = data.roomTextId
             binding.ivPlayer1.setImageResource(
-                if (data.playerFirstName.isNullOrEmpty()) R.drawable.ic_baseline_person_24 else R.drawable.ic_baseline_person_orange_24,
+                if (data.playerFirst == null) R.drawable.ic_baseline_person_24 else R.drawable.ic_baseline_person_orange_24,
             )
             binding.ivPlayer2.setImageResource(
-                if (data.playerSecondName.isNullOrEmpty()) R.drawable.ic_baseline_person_24 else R.drawable.ic_baseline_person_orange_24,
+                if (data.playerSecond == null) R.drawable.ic_baseline_person_24 else R.drawable.ic_baseline_person_orange_24,
             )
         }
     }

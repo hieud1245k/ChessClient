@@ -1,7 +1,6 @@
 package com.hieuminh.chessclient.repositories.impl
 
 import com.hieuminh.chessclient.models.Room
-import com.hieuminh.chessclient.models.response.BaseResponse
 import com.hieuminh.chessclient.providers.ApiClientProvider
 import com.hieuminh.chessclient.repositories.ChessRepository
 import com.hieuminh.chessclient.services.ChessService
@@ -16,25 +15,17 @@ class ChessRepositoryImpl(private val service: ChessService = ApiClientProvider.
         }
     }
 
-    override suspend fun createNewRoom(name: String): Result<Room> {
+    override suspend fun createNewRoom(playerId: Long): Result<Room> {
         return try {
-            Result.success(service.createNewRoomAsync(name).await())
+            Result.success(service.createNewRoomAsync(playerId).await())
         } catch (throwable: Throwable) {
             Result.failure(throwable)
         }
     }
 
-    override suspend fun joinRoom(id: Long, name: String): Result<Room> {
+    override suspend fun joinRoom(roomId: Long, playerId: Long): Result<Room> {
         return try {
-            Result.success(service.joinRoomAsync(id, name).await())
-        } catch (throwable: Throwable) {
-            Result.failure(throwable)
-        }
-    }
-
-    override suspend fun saveName(name: String): Result<BaseResponse> {
-        return try {
-            Result.success(service.saveNameAsync(name).await())
+            Result.success(service.joinRoomAsync(roomId, playerId).await())
         } catch (throwable: Throwable) {
             Result.failure(throwable)
         }
@@ -48,17 +39,17 @@ class ChessRepositoryImpl(private val service: ChessService = ApiClientProvider.
         }
     }
 
-    override suspend fun startOfflineGame(name: String): Result<Room> {
+    override suspend fun startOfflineGame(playerId: Long): Result<Room> {
         return try {
-            Result.success(service.startOfflineGameAsync(name).await())
+            Result.success(service.startOfflineGameAsync(playerId).await())
         } catch (throwable: Throwable) {
             Result.failure(throwable)
         }
     }
 
-    override suspend fun playNow(name: String): Result<Room> {
+    override suspend fun playNow(playerId: Long): Result<Room> {
         return try {
-            Result.success(service.playNowAsync(name).await())
+            Result.success(service.playNowAsync(playerId).await())
         } catch (throwable: Throwable) {
             Result.failure(throwable)
         }

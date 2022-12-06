@@ -98,7 +98,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                     yourTurn = true
                     updateProcess()
                 }, {
-                   toast( "Connect to /queue/go-to-box Failure!")
+                    toast("Connect to /queue/go-to-box Failure!")
                 })
         }
         subscribe { stompClient ->
@@ -107,21 +107,21 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ stomMessage ->
                     JsonUtils.fromJson<Room>(stomMessage.payload)?.let {
-                        binding.llStartGame.isVisible = room.playerFirstName == null || room.playerSecondName == null
+                        binding.llStartGame.isVisible = room.playerFirst == null || room.playerSecond == null
                         if (
-                            (it.playerFirstName == null || it.playerSecondName == null)
-                            && room.playerFirstName != null
-                            && room.playerSecondName != null
+                            (it.playerFirst == null || it.playerSecond == null)
+                            && room.playerFirst != null
+                            && room.playerSecond != null
                         ) {
-                            val rivalName = room.getRivalPlayerName(name)
-                           toast( "$rivalName have left this room")
+                            val rivalName = room.getRivalPlayer(name)
+                            toast("$rivalName have left this room")
                             resetData()
                         }
                         room = it
                         updateRivalName(true)
                     }
                 }, {
-                   toast( "Connect to /queue/go-to-box Failure!")
+                    toast("Connect to /queue/go-to-box Failure!")
                 })
         }
         subscribe { stompClient ->
@@ -133,9 +133,9 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                     yourTurn = firstPlayerName == name
                     updateProcess()
                     binding.llStartGame.isVisible = false
-                   toast( if (yourTurn) R.string.your_turn else R.string.please_waiting)
+                    toast(if (yourTurn) R.string.your_turn else R.string.please_waiting)
                 }, {
-                   toast( "Connect to /queue/go-to-box Failure!")
+                    toast("Connect to /queue/go-to-box Failure!")
                 })
         }
     }
@@ -179,7 +179,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         val chessRequest = ChessRequest()
         chessRequest.from = currentBoxSelected?.copy()
         chessRequest.to = item.copy()
-        chessRequest.playerName = room.getRivalPlayerName(name)
+        chessRequest.playerName = room.getRivalPlayer(name)?.name
         chessRequest.roomId = room.id
         currentChessRequest = ChessRequest().apply {
             from = currentBoxSelected
@@ -341,7 +341,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         val roomRequest = room
         roomRequest.resetPlayerName(name)
         chessViewModel?.leaveRoom(roomRequest, {
-           toast( "You left game!")
+            toast("You left game!")
             view?.navController?.popBackStack()
         })
     }
@@ -390,9 +390,9 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     }
 
     private fun updateRivalName(rivalJoined: Boolean = false) {
-        val rivalName = room.getRivalPlayerName(name)
+        val rivalName = room.getRivalPlayer(name)?.name
         if (rivalName != null && rivalJoined) {
-           toast( "$rivalName have joined this room")
+            toast("$rivalName have joined this room")
         }
         binding.layoutRivalInfo.tvName.text = rivalName ?: resources.getString(R.string.waiting_for_the_next_player)
         binding.layoutYourInfo.tvStatus.setText(R.string.please_waiting)
@@ -433,7 +433,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
             .setMessage(if (win) "Congratulation!" else "Press \"Continue\" to start new game!")
             .setPositiveButton("Continue") { _, _ ->
                 resetData()
-                if (name.equals(room.playerFirstName)) {
+                if (name.equals(room.playerFirst?.name)) {
                     binding.llStartGame.isVisible = true
                 }
             }

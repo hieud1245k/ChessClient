@@ -83,7 +83,7 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
         val chessRequest = ChessRequest()
         chessRequest.from = currentBoxSelected?.copy()
         chessRequest.to = item.copy()
-        chessRequest.playerName = room.getRivalPlayerName(name)
+        chessRequest.playerName = room.getRivalPlayer(name)?.name
         chessRequest.roomId = room.id
         currentChessRequest = ChessRequest().apply {
             from = currentBoxSelected
@@ -249,7 +249,7 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
         val roomRequest = room
         roomRequest.resetPlayerName(name)
         chessViewModel?.leaveRoom(roomRequest, {
-           toast("You left game!")
+            toast("You left game!")
             view?.navController?.popBackStack()
         })
     }
@@ -300,11 +300,11 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
                             yourTurn = true
                             updateProcess()
                         }, {
-                           toast("Connect to /queue/go-to-box Failure!")
+                            toast("Connect to /queue/go-to-box Failure!")
                         })
                 }
-                yourTurn = room.firstPlay == name
-               toast(if (yourTurn) R.string.your_turn else R.string.please_waiting)
+                yourTurn = room.firstPlay?.name == name
+                toast(if (yourTurn) R.string.your_turn else R.string.please_waiting)
                 updateProcess()
                 binding.llStartGame.isVisible = false
             }

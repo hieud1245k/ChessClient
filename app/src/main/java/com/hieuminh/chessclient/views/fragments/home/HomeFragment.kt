@@ -38,7 +38,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(), BaseAdapter.ItemEventL
     }
 
     override fun onItemClick(item: Room, position: Int) {
-        joinRoom(item.id ?: return, name)
+        joinRoom(item.id, name)
     }
 
     override fun initListener() {

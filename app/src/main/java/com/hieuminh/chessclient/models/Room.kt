@@ -4,31 +4,31 @@ import android.os.Parcel
 import android.os.Parcelable
 
 class Room() : Parcelable {
-    var id: Long? = null
+    var id: Long = 0
 
-    var playerFirstName: String? = null
+    var playerFirst: Player? = null
 
-    var playerSecondName: String? = null
+    var playerSecond: Player? = null
 
-    var firstPlay: String? = null
+    var firstPlay: Player? = null
 
     var isOnline: Boolean = true
 
     val roomTextId: String
         get() = "Room id: $id"
 
-    fun getRivalPlayerName(name: String?): String? {
-        if (name.equals(playerFirstName)) {
-            return playerSecondName
+    fun getRivalPlayer(currentPlayerName: String?): Player? {
+        if (currentPlayerName.equals(playerFirst?.name)) {
+            return playerSecond
         }
-        return playerFirstName
+        return playerFirst
     }
 
-    fun resetPlayerName(name: String) {
-        if (playerFirstName == name) {
-            playerFirstName = null
+    fun resetPlayerName(currentPlayerName: String) {
+        if (playerFirst?.name == currentPlayerName) {
+            playerFirst = null
         } else {
-            playerSecondName = null
+            playerSecond = null
         }
     }
 
