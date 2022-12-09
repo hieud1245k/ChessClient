@@ -32,6 +32,10 @@ class Room() : Parcelable {
         }
     }
 
+    fun isFullPlayer(): Boolean {
+        return playerFirstName != null && playerSecondName != null
+    }
+
     constructor(parcel: Parcel) : this()
 
     override fun describeContents() = 0

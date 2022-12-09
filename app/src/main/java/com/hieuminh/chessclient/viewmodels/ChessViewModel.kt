@@ -126,4 +126,19 @@ class ChessViewModel(private val repository: ChessRepository = ChessRepositoryIm
             }
         }
     }
+
+    fun kickTheOpponent(room: Room, rivalName: String, success: (Room) -> Unit) {
+        viewModelScope.launch {
+            val result = repository.kickTheOpponent(room, rivalName)
+            when {
+                result.isSuccess -> {
+                    val roomResponse = result.getOrNull() ?: return@launch
+                    success(roomResponse)
+                }
+                else -> {
+                    Log.d("ERROR", result.exceptionOrNull()?.message ?: "")
+                }
+            }
+        }
+    }
 }

@@ -3,6 +3,7 @@ package com.hieuminh.chessclient.views.fragments.chess
 import android.app.AlertDialog
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.gson.Gson
@@ -12,8 +13,10 @@ import com.hieuminh.chessclient.common.enums.PlayerType
 import com.hieuminh.chessclient.common.extensions.ViewExtensions.navController
 import com.hieuminh.chessclient.databinding.FragmentPlayChessBinding
 import com.hieuminh.chessclient.databinding.LayoutPlayerInfoBinding
+import com.hieuminh.chessclient.interfaces.PopupMenuListener
 import com.hieuminh.chessclient.models.*
 import com.hieuminh.chessclient.models.request.ChessRequest
+import com.hieuminh.chessclient.utils.AppUtils
 import com.hieuminh.chessclient.utils.JsonUtils
 import com.hieuminh.chessclient.utils.ViewUtils
 import com.hieuminh.chessclient.views.adapters.BoxAdapter
@@ -39,6 +42,8 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     private var currentChessRequest: ChessRequest? = null
 
     private var yourTurn = false
+    private var isRoomOwner = false
+    private var isGameStarted = false
 
     override fun getViewBinding() = FragmentPlayChessBinding.inflate(layoutInflater)
 
@@ -49,6 +54,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         room = args.room
         name = args.name
         createRoom = args.createRoom
+        isRoomOwner = createRoom
     }
 
     override fun onResume() {
@@ -98,7 +104,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                     yourTurn = true
                     updateProcess()
                 }, {
-                   toast( "Connect to /queue/go-to-box Failure!")
+                    toast("Connect to /queue/go-to-box Failure!")
                 })
         }
         subscribe { stompClient ->
@@ -107,21 +113,10 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ stomMessage ->
                     JsonUtils.fromJson<Room>(stomMessage.payload)?.let {
-                        binding.llStartGame.isVisible = room.playerFirstName == null || room.playerSecondName == null
-                        if (
-                            (it.playerFirstName == null || it.playerSecondName == null)
-                            && room.playerFirstName != null
-                            && room.playerSecondName != null
-                        ) {
-                            val rivalName = room.getRivalPlayerName(name)
-                           toast( "$rivalName have left this room")
-                            resetData()
-                        }
-                        room = it
-                        updateRivalName(true)
+                        updateRoomPlayers(it)
                     }
                 }, {
-                   toast( "Connect to /queue/go-to-box Failure!")
+                    toast("Connect to /queue/go-to-box Failure!")
                 })
         }
         subscribe { stompClient ->
@@ -133,9 +128,24 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                     yourTurn = firstPlayerName == name
                     updateProcess()
                     binding.llStartGame.isVisible = false
-                   toast( if (yourTurn) R.string.your_turn else R.string.please_waiting)
+                    isGameStarted = true
+                    toast(if (yourTurn) R.string.your_turn else R.string.please_waiting)
                 }, {
-                   toast( "Connect to /queue/go-to-box Failure!")
+                    toast("Connect to /queue/go-to-box Failure!")
+                })
+        }
+
+        subscribe { stompClient ->
+            stompClient.topic("/queue/kick/${room.id}/${AppUtils.getPath(name)}")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({ stompMessage ->
+                    JsonUtils.fromJson<Room>(stompMessage.payload)?.let {
+                        toast("You were kicked out by the owner of this room!")
+                        view?.navController?.popBackStack()
+                    }
+                }, {
+                    toast("Connect to /queue/kick/${room.id}/${AppUtils.getPath(name)} Failure!")
                 })
         }
     }
@@ -171,6 +181,22 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         }
         resetActionList()
         onChessmanClicked(item)
+    }
+
+    private fun updateRoomPlayers(roomResp: Room) {
+        binding.llStartGame.isVisible = room.playerFirstName == null || room.playerSecondName == null
+        if (
+            (roomResp.playerFirstName == null || roomResp.playerSecondName == null)
+            && room.isFullPlayer()
+        ) {
+            val rivalName = room.getRivalPlayerName(name)
+            toast("$rivalName have left this room")
+            resetData()
+            isRoomOwner = true
+            isGameStarted = false
+        }
+        room = roomResp
+        updateRivalName(true)
     }
 
     private fun sendChessmanAction(item: Box) {
@@ -341,9 +367,34 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
         val roomRequest = room
         roomRequest.resetPlayerName(name)
         chessViewModel?.leaveRoom(roomRequest, {
-           toast( "You left game!")
+            toast("You left game!")
             view?.navController?.popBackStack()
         })
+    }
+
+    private fun showMenuOptions() {
+        val popupMenuListener = object : PopupMenuListener {
+            override fun itemClick(id: MenuItem) {
+                when (id.itemId) {
+                    R.id.menuItemLeave -> {
+                        AlertDialog.Builder(context)
+                            .setTitle(R.string.notice)
+                            .setMessage(getString(R.string.are_you_sure_you_want_to_leave_this_room))
+                            .setPositiveButton(getString(R.string.leave)) { _, _ -> leave() }
+                            .setNegativeButton(R.string.cancel, null)
+                            .show()
+                    }
+                    R.id.menuItemKick -> {
+                        chessViewModel?.kickTheOpponent(room, room.getRivalPlayerName(name) ?: "") {
+                            updateRoomPlayers(it)
+                        }
+                    }
+                }
+            }
+        }
+        AppUtils.showPopupMenu(activity, binding.ivBack, R.menu.menu_action, popupMenuListener) {
+            it.findItem(R.id.menuItemKick)?.isVisible = room.isFullPlayer() && isRoomOwner && !isGameStarted
+        }
     }
 
     override fun initListener() {
@@ -354,17 +405,11 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                 }
             }
         }
-        binding.ivBack.setOnClickListener {
-            AlertDialog.Builder(context)
-                .setTitle(R.string.notice)
-                .setMessage(getString(R.string.are_you_sure_you_want_to_leave_this_room))
-                .setPositiveButton(getString(R.string.leave)) { _, _ -> leave() }
-                .setNegativeButton(R.string.cancel, null)
-                .show()
-        }
+        binding.ivBack.setOnClickListener { showMenuOptions() }
     }
 
     override fun initView() {
+        binding.ivBack.setImageResource(R.drawable.ic_baseline_menu_24)
         binding.ivRoomId.text = room.roomTextId
 
         val size = min(ViewUtils.getScreenWidth(activity), ViewUtils.getScreenHeight(activity)) - 50
@@ -392,7 +437,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     private fun updateRivalName(rivalJoined: Boolean = false) {
         val rivalName = room.getRivalPlayerName(name)
         if (rivalName != null && rivalJoined) {
-           toast( "$rivalName have joined this room")
+            toast("$rivalName have joined this room")
         }
         binding.layoutRivalInfo.tvName.text = rivalName ?: resources.getString(R.string.waiting_for_the_next_player)
         binding.layoutYourInfo.tvStatus.setText(R.string.please_waiting)

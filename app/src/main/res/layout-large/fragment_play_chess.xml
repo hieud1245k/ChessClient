@@ -63,8 +63,9 @@
     <include
         android:id="@+id/layout_rival_info"
         layout="@layout/layout_player_info"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dp_8"
         app:layout_constraintBottom_toTopOf="@id/layout_your_info"
         app:layout_constraintEnd_toStartOf="@id/rv_box_list"
         app:layout_constraintStart_toStartOf="parent"
@@ -73,8 +74,9 @@
     <include
         android:id="@+id/layout_your_info"
         layout="@layout/layout_player_info"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dp_8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/rv_box_list"
         app:layout_constraintStart_toStartOf="parent"

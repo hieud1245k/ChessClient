@@ -3,7 +3,6 @@ package com.hieuminh.chessclient.services
 import com.hieuminh.chessclient.models.Room
 import com.hieuminh.chessclient.models.response.BaseResponse
 import kotlinx.coroutines.Deferred
-import org.json.JSONObject
 import retrofit2.http.*
 
 interface ChessService {
@@ -34,4 +33,7 @@ interface ChessService {
     @PUT("/api/rooms/play-now")
     @FormUrlEncoded
     fun playNowAsync(@Field("name") name: String): Deferred<Room>
+
+    @PUT("/api/rooms/kick")
+    fun kickTheOpponentAsync(@Body room: Room, @Query("rival_name") rivalName: String): Deferred<Room>
 }

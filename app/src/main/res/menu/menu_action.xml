@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menuItemLeave"
+        android:icon="@drawable/ic_baseline_exit_to_app_24"
+        android:title="@string/leave" />
+
+    <item
+        android:id="@+id/menuItemKick"
+        android:icon="@drawable/ic_baseline_person_remove_24"
+        android:title="@string/kick_the_opponent" />
+
+</menu>

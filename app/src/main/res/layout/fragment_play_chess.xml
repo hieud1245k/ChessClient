@@ -63,7 +63,7 @@
     <include
         android:id="@+id/layout_rival_info"
         layout="@layout/layout_player_info"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dp_16"
         app:layout_constraintBottom_toTopOf="@id/rv_box_list"
@@ -74,7 +74,7 @@
     <include
         android:id="@+id/layout_your_info"
         layout="@layout/layout_player_info"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/dp_16"
         app:layout_constraintBottom_toBottomOf="parent"
