@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hieuminh.chessclient.models.Player
 import com.hieuminh.chessclient.models.Room
 import com.hieuminh.chessclient.models.response.BaseResponse
 import com.hieuminh.chessclient.repositories.ChessRepository
@@ -94,9 +95,13 @@ class ChessViewModel(private val repository: ChessRepository = ChessRepositoryIm
         }
     }
 
-    fun startOfflineGame(name: String, success: (Room) -> Unit) {
+    fun startOfflineGame(name: String, level: Int, success: (Room) -> Unit) {
         viewModelScope.launch {
-            val result = repository.startOfflineGame(name)
+            val player = Player().apply {
+                this.name = name
+                this.level = level
+            }
+            val result = repository.startOfflineGame(player)
 
             when {
                 result.isSuccess -> {

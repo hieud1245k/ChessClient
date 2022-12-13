@@ -2,6 +2,7 @@ package com.hieuminh.chessclient.models
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.hieuminh.chessclient.databinding.LayoutStartGameBinding
 
 class Room() : Parcelable {
     var id: Long? = null
@@ -34,6 +35,14 @@ class Room() : Parcelable {
 
     fun isFullPlayer(): Boolean {
         return playerFirstName != null && playerSecondName != null
+    }
+
+    fun setPlayerInfo(startGameBinding: LayoutStartGameBinding) {
+        startGameBinding.run {
+            tvRoomId.text = "Room id: $id"
+            tvPlayerFirstName.text = playerFirstName
+            tvPlayerSecondName.text = playerSecondName
+        }
     }
 
     constructor(parcel: Parcel) : this()

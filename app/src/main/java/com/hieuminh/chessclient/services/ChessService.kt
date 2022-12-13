@@ -1,5 +1,6 @@
 package com.hieuminh.chessclient.services
 
+import com.hieuminh.chessclient.models.Player
 import com.hieuminh.chessclient.models.Room
 import com.hieuminh.chessclient.models.response.BaseResponse
 import kotlinx.coroutines.Deferred
@@ -27,8 +28,7 @@ interface ChessService {
     fun leaveRoomAsync(@Body room: Room): Deferred<Room>
 
     @POST("/api/rooms/start-offline-game")
-    @FormUrlEncoded
-    fun startOfflineGameAsync(@Field("name") name: String): Deferred<Room>
+    fun startOfflineGameAsync(@Body player: Player): Deferred<Room>
 
     @PUT("/api/rooms/play-now")
     @FormUrlEncoded

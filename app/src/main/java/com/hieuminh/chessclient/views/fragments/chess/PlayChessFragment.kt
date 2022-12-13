@@ -127,7 +127,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                     val firstPlayerName = stompMessage.payload
                     yourTurn = firstPlayerName == name
                     updateProcess()
-                    binding.llStartGame.isVisible = false
+                    binding.layoutStartGame.root.isVisible = false
                     isGameStarted = true
                     toast(if (yourTurn) R.string.your_turn else R.string.please_waiting)
                 }, {
@@ -184,7 +184,8 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     }
 
     private fun updateRoomPlayers(roomResp: Room) {
-        binding.llStartGame.isVisible = room.playerFirstName == null || room.playerSecondName == null
+        binding.layoutStartGame.root.isVisible = room.playerFirstName == null || room.playerSecondName == null
+        roomResp.setPlayerInfo(binding.layoutStartGame)
         if (
             (roomResp.playerFirstName == null || roomResp.playerSecondName == null)
             && room.isFullPlayer()
@@ -398,7 +399,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     }
 
     override fun initListener() {
-        binding.btStartGame.setOnClickListener {
+        binding.layoutStartGame.btStartGame.setOnClickListener {
             subscribe { stompClient ->
                 stompClient.send("/app/start-game", room.id.toString()).compose(applySchedulers()).subscribe {
                     Log.d("START_GAME", "Send start game message successful!")
@@ -411,6 +412,10 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     override fun initView() {
         binding.ivBack.setImageResource(R.drawable.ic_baseline_menu_24)
         binding.ivRoomId.text = room.roomTextId
+        binding.layoutStartGame.run {
+            llLevel.isVisible = false
+            root.isVisible = false
+        }
 
         val size = min(ViewUtils.getScreenWidth(activity), ViewUtils.getScreenHeight(activity)) - 50
         boxAdapter = BoxAdapter(size / 8)
@@ -479,7 +484,8 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
             .setPositiveButton("Continue") { _, _ ->
                 resetData()
                 if (name.equals(room.playerFirstName)) {
-                    binding.llStartGame.isVisible = true
+                    binding.layoutStartGame.root.isVisible = true
+                    room.setPlayerInfo(binding.layoutStartGame)
                 }
             }
             .setCancelable(false)

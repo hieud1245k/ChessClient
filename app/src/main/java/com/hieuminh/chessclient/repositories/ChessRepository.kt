@@ -1,5 +1,6 @@
 package com.hieuminh.chessclient.repositories
 
+import com.hieuminh.chessclient.models.Player
 import com.hieuminh.chessclient.models.Room
 import com.hieuminh.chessclient.models.response.BaseResponse
 
@@ -14,7 +15,7 @@ interface ChessRepository {
 
     suspend fun leaveRoom(room: Room): Result<Room>
 
-    suspend fun startOfflineGame(name: String): Result<Room>
+    suspend fun startOfflineGame(player: Player): Result<Room>
 
     suspend fun playNow(name: String): Result<Room>
 

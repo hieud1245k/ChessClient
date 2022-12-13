@@ -76,5 +76,9 @@
         android:id="@+id/ofllineChessFragment"
         android:name="com.hieuminh.chessclient.views.fragments.chess.OfflineChessFragment"
         android:label="fragment_oflline_chess"
-        tools:layout="@layout/fragment_play_chess" />
+        tools:layout="@layout/fragment_play_chess" >
+        <argument
+            android:name="name"
+            app:argType="string" />
+    </fragment>
 </navigation>

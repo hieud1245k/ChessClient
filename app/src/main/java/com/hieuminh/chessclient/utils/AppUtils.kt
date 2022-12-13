@@ -1,6 +1,9 @@
 package com.hieuminh.chessclient.utils
 
 import android.content.Context
+import android.os.Build
+import android.text.Html
+import android.text.Spanned
 import android.util.Log
 import android.view.Gravity
 import android.view.Menu
@@ -79,5 +82,16 @@ object AppUtils {
         } catch (e: Throwable) {
             Log.d("ERROR", e.message?:"")
         }
+    }
+
+    fun fromHtml(html: String): Spanned {
+        val url = decodeBOM(html)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Html.fromHtml(url, Html.FROM_HTML_MODE_LEGACY)
+        } else Html.fromHtml(url)
+    }
+
+    fun decodeBOM(url: String): String {
+        return url.replace("\uFEFF", "")
     }
 }

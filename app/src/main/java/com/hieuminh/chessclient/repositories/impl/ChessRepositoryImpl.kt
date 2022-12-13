@@ -1,5 +1,6 @@
 package com.hieuminh.chessclient.repositories.impl
 
+import com.hieuminh.chessclient.models.Player
 import com.hieuminh.chessclient.models.Room
 import com.hieuminh.chessclient.models.response.BaseResponse
 import com.hieuminh.chessclient.providers.ApiClientProvider
@@ -48,9 +49,9 @@ class ChessRepositoryImpl(private val service: ChessService = ApiClientProvider.
         }
     }
 
-    override suspend fun startOfflineGame(name: String): Result<Room> {
+    override suspend fun startOfflineGame(player: Player): Result<Room> {
         return try {
-            Result.success(service.startOfflineGameAsync(name).await())
+            Result.success(service.startOfflineGameAsync(player).await())
         } catch (throwable: Throwable) {
             Result.failure(throwable)
         }

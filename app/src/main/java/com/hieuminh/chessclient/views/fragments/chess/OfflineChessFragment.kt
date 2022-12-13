@@ -2,10 +2,14 @@ package com.hieuminh.chessclient.views.fragments.chess
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.gson.Gson
 import com.hieuminh.chessclient.R
+import com.hieuminh.chessclient.common.constants.NumberConstants
 import com.hieuminh.chessclient.common.enums.ChessManType
 import com.hieuminh.chessclient.common.enums.PlayerType
 import com.hieuminh.chessclient.common.extensions.ViewExtensions.navController
@@ -33,6 +37,7 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
     private val killBoxList = mutableListOf<Box>()
 
     private var name: String = ""
+    private var level = 1
     private var yourTurn: Boolean = false
     private var currentChessRequest: ChessRequest? = null
 
@@ -42,6 +47,7 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        name = OfflineChessFragmentArgs.fromBundle(requireArguments()).name
         initData()
     }
 
@@ -81,11 +87,12 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
         currentChessRequest?.resetJump(boxAdapter)
 
         val chessRequest = ChessRequest()
+        chessRequest.playerName = name
         chessRequest.from = currentBoxSelected?.copy()
         chessRequest.to = item.copy()
-        chessRequest.playerName = room.getRivalPlayerName(name)
         chessRequest.roomId = room.id
         currentChessRequest = ChessRequest().apply {
+            playerName = name
             from = currentBoxSelected
             to = item
         }
@@ -242,14 +249,14 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
     }
 
     private fun leave() {
-        if (binding.llStartGame.isVisible) {
+        if (binding.layoutStartGame.root.isVisible) {
             view?.navController?.popBackStack()
             return
         }
         val roomRequest = room
         roomRequest.resetPlayerName(name)
         chessViewModel?.leaveRoom(roomRequest, {
-           toast("You left game!")
+            toast("You left game!")
             view?.navController?.popBackStack()
         })
     }
@@ -266,8 +273,8 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
                 .setNegativeButton(R.string.cancel, null)
                 .show()
         }
-        binding.btStartGame.setOnClickListener {
-            chessViewModel?.startOfflineGame(name) {
+        binding.layoutStartGame.btStartGame.setOnClickListener {
+            chessViewModel?.startOfflineGame(name, level) {
                 this.room = it
                 subscribe { stompClient ->
                     stompClient.topic("/queue/offline/go-to-box/${room.id}")
@@ -300,14 +307,22 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
                             yourTurn = true
                             updateProcess()
                         }, {
-                           toast("Connect to /queue/go-to-box Failure!")
+                            toast("Connect to /queue/go-to-box Failure!")
                         })
                 }
                 yourTurn = room.firstPlay == name
-               toast(if (yourTurn) R.string.your_turn else R.string.please_waiting)
+                toast(if (yourTurn) R.string.your_turn else R.string.please_waiting)
                 updateProcess()
-                binding.llStartGame.isVisible = false
+                binding.layoutStartGame.root.isVisible = false
             }
+        }
+
+        binding.layoutStartGame.spinnerLevel.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                level = NumberConstants.level.getOrNull(position) ?: 1
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
     }
 
@@ -331,8 +346,12 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
         }
 
         binding.layoutRivalInfo.ivAvatar.setColorFilter(resources.getColor(R.color.black))
-        binding.llStartGame.isVisible = true
+        binding.layoutStartGame.root.isVisible = true
+        binding.layoutStartGame.tvPlayerFirstName.text = name
         binding.layoutRivalInfo.tvName.setText(R.string.robot)
+
+        // init Level spinner
+        binding.layoutStartGame.spinnerLevel.adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, NumberConstants.level)
     }
 
     private fun LayoutPlayerInfoBinding.updateProcess(yourTurn: Boolean) {

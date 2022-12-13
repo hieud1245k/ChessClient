@@ -42,4 +42,6 @@
     <string name="thu_xuan">Thu Xuan</string>
     <string name="kick">Kick</string>
     <string name="kick_the_opponent">Kick the opponent</string>
+    <string name="level">Level:</string>
+    <string name="chess_ai">Chess AI</string>
 </resources>
