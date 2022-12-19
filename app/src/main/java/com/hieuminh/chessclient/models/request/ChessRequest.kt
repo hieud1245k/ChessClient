@@ -15,6 +15,8 @@ class ChessRequest : Serializable {
 
     var checkmate: Boolean = false
 
+    var youWin: Boolean? = null
+
     fun resetJump(boxAdapter: BoxAdapter) {
         from?.run {
             justJump = false

@@ -261,6 +261,29 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
         })
     }
 
+    private fun resetData() {
+        initData()
+        boxAdapter.updateData(boxList)
+    }
+
+    private fun showGameResult(win: Boolean) {
+        AlertDialog.Builder(context)
+            .setTitle(if (win) R.string.you_win else R.string.you_lose)
+            .setMessage(if (win) "Congratulation!" else "Press \"Continue\" to start new game!")
+            .setPositiveButton("Continue") { _, _ ->
+                resetData()
+                updateProcess(true)
+                binding.layoutStartGame.root.isVisible = true
+            }
+            .setNegativeButton("Leave") { dialog, _ ->
+                leave()
+            }
+            .setCancelable(false)
+            .show()
+        yourTurn = false
+        updateProcess(true)
+    }
+
     override fun initListener() {
         binding.ivBack.setOnClickListener {
             view?.navController?.popBackStack()
@@ -282,6 +305,10 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(sub@{
                             val chessRequest = JsonUtils.fromJson<ChessRequest>(it.payload) ?: return@sub
+                            if (chessRequest.youWin != null) {
+                                showGameResult(chessRequest.youWin ?: false)
+                                return@sub
+                            }
                             currentChessRequest?.resetJump(boxAdapter)
 
                             val fromBox = boxMap[Pair(chessRequest.from?.x ?: 0, chessRequest.from?.y ?: 0)]
