@@ -69,6 +69,11 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(sub@{
                     val chessRequest = JsonUtils.fromJson<ChessRequest>(it.payload) ?: return@sub
+                    if (chessRequest.isInValidMove) {
+                        Log.d("xxx", "Invalid move")
+                        // TODO Invalid move
+                        return@sub
+                    }
                     val name = name
                     if (name != chessRequest.playerName) {
                         return@sub
