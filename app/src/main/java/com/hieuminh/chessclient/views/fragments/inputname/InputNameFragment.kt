@@ -3,32 +3,44 @@ package com.hieuminh.chessclient.views.fragments.inputname
 import android.util.Log
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
+import com.hieuminh.chessclient.R
 import com.hieuminh.chessclient.common.constants.UrlConstants
 import com.hieuminh.chessclient.common.extensions.ViewExtensions.navController
 import com.hieuminh.chessclient.databinding.FragmentInputNameBinding
 import com.hieuminh.chessclient.utils.AppUtils
+import com.hieuminh.chessclient.utils.AppUtils.enable
 import com.hieuminh.chessclient.views.fragments.base.BaseFragment
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 open class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
+    private var isFirstCheck = true
+
+    private val username: String
+        get() = binding.etInputName.text.toString().trim()
 
     override fun getViewBinding() = FragmentInputNameBinding.inflate(layoutInflater)
+
+    private fun updateSubmitButtonState() {
+        val isSubmitEnable = username.length in 6..30 && !username.contains("\\s+".toRegex())
+        binding.btSubmit.enable(isSubmitEnable)
+        binding.tvNameError.setText(R.string.name_must_be_not_contain_blank_and_between_6_and_30_characters)
+        binding.tvNameError.isVisible = !isSubmitEnable && !isFirstCheck
+        isFirstCheck = false
+    }
 
     override fun initListener() {
         binding.btSubmit.setOnClickListener { submit() }
         binding.etInputName.doAfterTextChanged {
-            binding.tvNameError.isVisible = false
+            updateSubmitButtonState()
         }
     }
 
     override fun initView() {
         binding.etIpAddress.setText(UrlConstants.ANDROID_EMULATOR_LOCALHOST)
         binding.etPort.setText(UrlConstants.SERVER_PORT)
+        updateSubmitButtonState()
     }
-
-    private val username: String
-        get() = binding.etInputName.text.toString().trim()
 
     private fun submit() {
         val ipAddress = binding.etIpAddress.text.toString().trim()
@@ -57,6 +69,7 @@ open class InputNameFragment : BaseFragment<FragmentInputNameBinding>() {
                             }
                             "404" -> {
                                 binding.tvNameError.isVisible = true
+                                binding.tvNameError.setText(R.string.name_is_exist_please_input_another_name)
                             }
                         }
                     }

@@ -80,7 +80,7 @@ object AppUtils {
                 }
             }
         } catch (e: Throwable) {
-            Log.d("ERROR", e.message?:"")
+            Log.d("ERROR", e.message ?: "")
         }
     }
 
@@ -93,5 +93,10 @@ object AppUtils {
 
     fun decodeBOM(url: String): String {
         return url.replace("\uFEFF", "")
+    }
+
+    fun View.enable(isEnable: Boolean) {
+        isEnabled = isEnable
+        alpha = if (isEnable) 1f else 0.5f
     }
 }

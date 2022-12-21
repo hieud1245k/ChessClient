@@ -44,4 +44,5 @@
     <string name="kick_the_opponent">Kick the opponent</string>
     <string name="level">Level:</string>
     <string name="chess_ai">Chess AI</string>
+    <string name="name_must_be_not_contain_blank_and_between_6_and_30_characters">Name must be not contain blank and between 6 and 30 characters!</string>
 </resources>

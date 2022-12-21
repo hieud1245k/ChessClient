@@ -44,6 +44,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     private var yourTurn = false
     private var isRoomOwner = false
     private var isGameStarted = false
+    private var leaveRoom = false
 
     override fun getViewBinding() = FragmentPlayChessBinding.inflate(layoutInflater)
 
@@ -189,7 +190,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     }
 
     private fun updateRoomPlayers(roomResp: Room) {
-        binding.layoutStartGame.root.isVisible = room.playerFirstName == null || room.playerSecondName == null
+        binding.layoutStartGame.root.isVisible = (room.playerFirstName == null || room.playerSecondName == null) && !leaveRoom
         roomResp.setPlayerInfo(binding.layoutStartGame)
         if (
             (roomResp.playerFirstName == null || roomResp.playerSecondName == null)
@@ -372,6 +373,7 @@ class PlayChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapter.
     private fun leave() {
         val roomRequest = room
         roomRequest.resetPlayerName(name)
+        leaveRoom = true
         chessViewModel?.leaveRoom(roomRequest, {
             toast("You left game!")
             view?.navController?.popBackStack()

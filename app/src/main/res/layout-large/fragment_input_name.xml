@@ -78,7 +78,6 @@
                 android:hint="@string/input_your_name"
                 android:importantForAutofill="no"
                 android:inputType="text"
-                android:text="@string/name_example"
                 android:textSize="@dimen/sp_14" />
 
             <TextView
