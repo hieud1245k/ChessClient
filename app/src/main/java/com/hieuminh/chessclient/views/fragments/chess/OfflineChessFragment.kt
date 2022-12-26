@@ -341,6 +341,7 @@ class OfflineChessFragment : BaseFragment<FragmentPlayChessBinding>(), BaseAdapt
                 toast(if (yourTurn) R.string.your_turn else R.string.please_waiting)
                 updateProcess()
                 binding.layoutStartGame.root.isVisible = false
+                binding.ivRoomId.text = "Level: $level"
             }
         }
 
